@@ -1,0 +1,57 @@
+button {
+  background-color: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+button:hover {
+  background-color: var(--vscode-button-hoverBackground);
+}
+
+input {
+  background-color: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border);
+  padding: 5px;
+  margin-inline: 5px;
+}
+
+textarea {
+  background-color: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  padding: 5px;
+  margin: 5px;
+}
+
+.convert-result-textarea {
+  font-weight: 400;
+  color: orange;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.d-flex-row {
+  flex-direction: row;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.w-95 {
+  width: 95%;
+}
+
+
+.flex-1 {
+  flex: 1;
+}
+
+.no-resize {
+  resize: none;
+}

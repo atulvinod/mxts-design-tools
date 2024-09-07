@@ -9,16 +9,20 @@
   "categories": [
     "Other"
   ],
+  "files": [
+    "media",
+    "out"
+  ],
   "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
     "views": {
       "activity-bar-view-container": [
         {
-          "id": "design-tools",
-          "name": "Main Activity",
+          "id": "value-to-token",
+          "name": "Unit values to spacing tokens",
           "icon": "media/pen-drawing-icon.svg",
-          "contextualTitle": "Design tools",
+          "contextualTitle": "Converts rem or px values to spacing design tokens",
           "type": "webview"
         }
       ]
