@@ -1,19 +1,10 @@
-const BASE_PX_VALUE = 16;
-const SPACING_TOKENS = {
-  32: '$spacing-3xl',
-  16: '$spacing-l',
-  12: '$spacing-m',
-  8: '$spacing-s',
-  4: '$spacing-xs',
-  2: '$spacing-2xs',
-  24: '$spacing-2xl',
-  40: '$spacing-4xl',
-  20: '$spacing-xl',
-};
+import { appConfig } from './config';
 
-const SPACING_BREAKPOINTS = Object.keys( SPACING_TOKENS ).sort( ( a, b ) => Number(a) - Number(b) ).map( Number );
+const { BASE_REM_VALUE, SPACING_TOKENS } = appConfig.value;
 
-function getSpacingToken ( isNegative: boolean, tokenValue: string, multiplier?: string ) {
+const SPACING_BREAKPOINTS = Object.keys( SPACING_TOKENS ).sort( ( a, b ) => Number( a ) - Number( b ) ).map( Number );
+
+function getSpacingToken( isNegative: boolean, tokenValue: string, multiplier?: string ) {
   const sign = ( isNegative ? "-" : '' );
   if ( multiplier ) {
     return sign + multiplier + ' * tokens.' + tokenValue;
@@ -25,8 +16,8 @@ function getSpacingToken ( isNegative: boolean, tokenValue: string, multiplier?:
  * 
  * @param {string} value 
  */
-export function convertToSpacingToken ( value: string ) {
-  if ( value.includes( '$' ) || value.includes( 'rem-calc' ) || /[1-9]em$/gi.test(value) || value.endsWith('px') ) {
+export function convertToSpacingToken( value: string ) {
+  if ( value.includes( '$' ) || value.includes( 'rem-calc' ) || /[1-9]em$/gi.test( value ) || value.endsWith( 'px' ) ) {
     return value;
   }
 
@@ -38,7 +29,7 @@ export function convertToSpacingToken ( value: string ) {
     return value;
   }
 
-  let pxValue = Number( numericValue ) * ( unit === 'rem' ? BASE_PX_VALUE : 1 );
+  let pxValue = Number( numericValue ) * ( unit === 'rem' ? BASE_REM_VALUE : 1 );
 
   if ( !pxValue ) {
     return 0;

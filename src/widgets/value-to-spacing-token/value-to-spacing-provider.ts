@@ -1,7 +1,9 @@
 import * as vscode from 'vscode';
 import { getNonce } from '../../utils';
 import * as valueConverters from '../../lib/value-converters';
+import { appConfig } from '../../lib/config';
 
+const {BASE_REM_VALUE} = appConfig.value;
 
 function getWebViewContent( webview: vscode.Webview, extensionUri: vscode.Uri ) {
   const mainStyleUri = webview.asWebviewUri( vscode.Uri.joinPath( extensionUri, 'media', 'main.css' ) );
@@ -24,6 +26,7 @@ function getWebViewContent( webview: vscode.Webview, extensionUri: vscode.Uri ) 
                 <button id='convert-button'>Convert</button>
               </div>
               <textarea rows="5" class='w-95 convert-result-textarea no-resize' placeholder='Result' readonly id='convert-result-textarea'></textarea>
+              <span class='text-subtext'>1REM = ${BASE_REM_VALUE}px </span>
             </body>
             <script src="${ scriptUri }" nonce="${ nonce }"></script>
           </html>

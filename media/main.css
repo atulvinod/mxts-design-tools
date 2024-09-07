@@ -26,6 +26,10 @@ textarea {
   margin: 5px;
 }
 
+.text-subtext {
+  color: var(--vscode-descriptionForeground);
+}
+
 .convert-result-textarea {
   font-weight: 400;
   color: orange;
