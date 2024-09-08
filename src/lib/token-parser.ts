@@ -1,7 +1,6 @@
 import * as path from 'path';
 import * as fs from 'fs';
 
-const CORE_DIR_PATH = path.join( 'D:', 'projects', 'core' );
 export const getDesignTokenDirPath = ( coreDirPath: string ) => path.join( coreDirPath, 'lib', 'design-tokens', 'src' );
 export const getScssTokensDirPath = ( coreDirPath: string ) => path.join( getDesignTokenDirPath( coreDirPath ), 'scss-tokens' );
 
@@ -56,13 +55,13 @@ function processScssFile( filePath: string, processLineCallback: ( a0: string, a
   return agg;
 }
 
-function getThemeBasedColors() {
-  const lightTheme = getRootColors( path.join( getScssTokensDirPath( CORE_DIR_PATH ), '_light.scss' ) );
-  const darkTheme = getRootColors( path.join( getScssTokensDirPath( CORE_DIR_PATH ), '_dark.scss' ) );
+function getThemeBasedColors( coreDirPath: string ) {
+  const lightTheme = getRootColors( path.join( getScssTokensDirPath( coreDirPath ), '_light.scss' ) );
+  const darkTheme = getRootColors( path.join( getScssTokensDirPath( coreDirPath ), '_dark.scss' ) );
   return { lightTheme, darkTheme };
 }
 
-function getRadiusAndSpacingTokens() {
+function getRadiusAndSpacingTokens( coreDirPath: string ) {
 
   /**
    * 
@@ -78,15 +77,15 @@ function getRadiusAndSpacingTokens() {
     return agg;
   };
 
-  const radiusTokens = processScssFile( path.join( getScssTokensDirPath( CORE_DIR_PATH ), '_radius.scss' ), processLine );
-  const spacingTokens = processScssFile( path.join( getScssTokensDirPath( CORE_DIR_PATH ), '_spacing.scss' ), processLine );
+  const radiusTokens = processScssFile( path.join( getScssTokensDirPath( coreDirPath ), '_radius.scss' ), processLine );
+  const spacingTokens = processScssFile( path.join( getScssTokensDirPath( coreDirPath ), '_spacing.scss' ), processLine );
 
   return { radiusTokens, spacingTokens };
 }
 
 type themeColorType = { lightTheme: { [ key: string ]: string }, darkTheme: { [ key: string ]: string } };
 
-function getColorTokens( themeColors: themeColorType ) {
+function getColorTokens( themeColors: themeColorType, coreDirPath: string ) {
   const { lightTheme, darkTheme } = themeColors;
 
   const processColorTokenLine = ( line: string, agg: { [ key: string ]: string } ) => {
@@ -97,7 +96,7 @@ function getColorTokens( themeColors: themeColorType ) {
     }
     return agg;
   };
-  const tokens = processScssFile( path.join( getScssTokensDirPath( CORE_DIR_PATH ), '_color.scss' ), processColorTokenLine );
+  const tokens = processScssFile( path.join( getScssTokensDirPath( coreDirPath ), '_color.scss' ), processColorTokenLine );
 
   const color_tokens = Object.entries( tokens ).reduce( ( agg: themeColorType, [ key, value ] ) => {
     agg.lightTheme[ key ] = lightTheme[ value as string ];
@@ -108,7 +107,7 @@ function getColorTokens( themeColors: themeColorType ) {
   return color_tokens;
 }
 
-function getAccentTokenColors() {
+function getAccentTokenColors( coreDirPath: string ) {
   const processLine = ( line: string, agg: { [ key: string ]: string } ) => {
     if ( line.startsWith( '$' ) ) {
       let [ token, value ] = line.split( ':' ).map( ( t ) => t.trim().replace( ';', '' ) );
@@ -119,11 +118,11 @@ function getAccentTokenColors() {
 
   const breakCondition = ( line: string ) => line.trim().startsWith( '$accent-color-map' );
 
-  const tokens = processScssFile( path.join( getScssTokensDirPath( CORE_DIR_PATH ), '_accent-color.scss' ), processLine, breakCondition );
+  const tokens = processScssFile( path.join( getScssTokensDirPath( coreDirPath ), '_accent-color.scss' ), processLine, breakCondition );
   return tokens;
 }
 
-function getOverlayTokens() {
+function getOverlayTokens( coreDirPath: string ) {
   const processLine = ( line: string, agg: { [ key: string ]: string } ) => {
     if ( line.startsWith( '$' ) ) {
       let [ token, value ] = getTokenAndValue( line );
@@ -134,11 +133,11 @@ function getOverlayTokens() {
 
   const breakCondition = ( line: string ) => line.trim().startsWith( '$color-map' );
 
-  const tokens = processScssFile( path.join( getScssTokensDirPath( CORE_DIR_PATH ), '_overlay-color.scss' ), processLine, breakCondition );
+  const tokens = processScssFile( path.join( getScssTokensDirPath( coreDirPath ), '_overlay-color.scss' ), processLine, breakCondition );
   return tokens;
 }
 
-function getChartTokens() {
+function getChartTokens( coreDirPath: string ) {
   const processLine = ( line: string, agg: { [ key: string ]: string } ) => {
     if ( line.startsWith( '$' ) ) {
       const [ token, value ] = getTokenAndValue( line );
@@ -147,6 +146,15 @@ function getChartTokens() {
     return agg;
   };
 
-  const tokens = processScssFile( path.join( getScssTokensDirPath( CORE_DIR_PATH ), '_chart-color.scss' ), processLine );
+  const tokens = processScssFile( path.join( getScssTokensDirPath( coreDirPath ), '_chart-color.scss' ), processLine );
   return tokens;
+}
+
+
+export function parseTokens( coreDirPath: string ) {
+  const { spacingTokens } = getRadiusAndSpacingTokens( coreDirPath );
+
+  return {
+    SPACING_TOKENS: spacingTokens
+  };
 }

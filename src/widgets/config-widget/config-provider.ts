@@ -10,7 +10,7 @@ function getWebViewContent( webview: vscode.Webview, extensionUri: vscode.Uri ) 
   const openSettingsSvg = webview.asWebviewUri( vscode.Uri.joinPath( extensionUri, 'media', 'open.svg' ) );
 
   return `
-    <!DOCTYPE html>
+      <!DOCTYPE html>
       <html lang="en">
       <head>
         <meta charset="UTF-8">

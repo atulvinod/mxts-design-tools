@@ -1,8 +1,20 @@
-import { appConfig } from './config';
+import * as appConfig from './config';
 
-const { BASE_REM_VALUE, SPACING_TOKENS } = appConfig.value;
+let BASE_REM_VALUE = 16;
+let SPACING_TOKENS: { [ key: string ]: string } = {};
+let SPACING_BREAKPOINTS: number[] = [];
 
-const SPACING_BREAKPOINTS = Object.keys( SPACING_TOKENS ).sort( ( a, b ) => Number( a ) - Number( b ) ).map( Number );
+appConfig.appConfig.subscribe( ( values ) => {
+  if ( values.IS_TOKEN_CONFIG_LOADED ) {
+    const spacingTokens = values[ appConfig.APP_CONFIG_KEYS.SPACING_TOKENS ]['SPACING_TOKENS'];
+    Object.entries( spacingTokens ).forEach( ( [ token, unitPxValue ] ) => {
+      const nonPxVal = ( unitPxValue as string ).replace( 'px', '' );
+      SPACING_TOKENS[ nonPxVal ] = token;
+    } );
+    SPACING_BREAKPOINTS = Object.keys( SPACING_TOKENS ).sort( ( a, b ) => Number( a ) - Number( b ) ).map( Number );
+  }
+} );
+
 
 function getSpacingToken( isNegative: boolean, tokenValue: string, multiplier?: string ) {
   const sign = ( isNegative ? "-" : '' );
