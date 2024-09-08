@@ -3,17 +3,20 @@ import { BehaviorSubject } from 'rxjs';
 export type AppConfigType = {
   BASE_REM_VALUE: number,
   CORE_LIB_LOCATION: string | null,
+  IS_VALID_CORE_LOCATION: false,
   [key: string]: any,
 };
 
 export const APP_CONFIG_KEYS = {
   'BASE_REM_VALUE': 'BASE_REM_VALUE',
-  'CORE_LIB_LOCATION': 'CORE_LIB_LOCATION'
+  'CORE_LIB_LOCATION': 'CORE_LIB_LOCATION',
+  'IS_VALID_CORE_LOCATION':'IS_VALID_CORE_LOCATION'
 };
 
 const CONFIG: AppConfigType = {
   BASE_REM_VALUE: 16,
   CORE_LIB_LOCATION: null,
+  IS_VALID_CORE_LOCATION: false,
   SPACING_TOKENS: {
     32: '$spacing-3xl',
     16: '$spacing-l',

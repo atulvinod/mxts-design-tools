@@ -72,6 +72,10 @@ textarea {
   display: none;
 }
 
+.d-block {
+  display: block;
+}
+
 .my-10{
   margin-block: 10px;
 }
@@ -84,4 +88,12 @@ textarea {
   height: 2rem;
     padding: 0;
     color: white;
+}
+
+.warning {
+  color: var(--vscode-errorForeground);
+}
+
+.success {
+  color: var(--vscode-errorLens-hintForeground);
 }

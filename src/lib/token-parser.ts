@@ -2,8 +2,8 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 const CORE_DIR_PATH = path.join( 'D:', 'projects', 'core' );
-const DESIGN_TOKEN_DIR_PATH = path.join( CORE_DIR_PATH, 'lib', 'design-tokens', 'src' );
-const SCSS_TOKENS_DIR_PATH = path.join( DESIGN_TOKEN_DIR_PATH, 'scss-tokens' );
+export const getDesignTokenDirPath = ( coreDirPath: string ) => path.join( coreDirPath, 'lib', 'design-tokens', 'src' );
+export const getScssTokensDirPath = ( coreDirPath: string ) => path.join( getDesignTokenDirPath( coreDirPath ), 'scss-tokens' );
 
 function trimRemCalc( value: string ) {
   return value.replace( 'rem-calc(', '' ).replace( ')', '' );
@@ -57,8 +57,8 @@ function processScssFile( filePath: string, processLineCallback: ( a0: string, a
 }
 
 function getThemeBasedColors() {
-  const lightTheme = getRootColors( path.join( SCSS_TOKENS_DIR_PATH, '_light.scss' ) );
-  const darkTheme = getRootColors( path.join( SCSS_TOKENS_DIR_PATH, '_dark.scss' ) );
+  const lightTheme = getRootColors( path.join( getScssTokensDirPath( CORE_DIR_PATH ), '_light.scss' ) );
+  const darkTheme = getRootColors( path.join( getScssTokensDirPath( CORE_DIR_PATH ), '_dark.scss' ) );
   return { lightTheme, darkTheme };
 }
 
@@ -78,8 +78,8 @@ function getRadiusAndSpacingTokens() {
     return agg;
   };
 
-  const radiusTokens = processScssFile( path.join( SCSS_TOKENS_DIR_PATH, '_radius.scss' ), processLine );
-  const spacingTokens = processScssFile( path.join( SCSS_TOKENS_DIR_PATH, '_spacing.scss' ), processLine );
+  const radiusTokens = processScssFile( path.join( getScssTokensDirPath( CORE_DIR_PATH ), '_radius.scss' ), processLine );
+  const spacingTokens = processScssFile( path.join( getScssTokensDirPath( CORE_DIR_PATH ), '_spacing.scss' ), processLine );
 
   return { radiusTokens, spacingTokens };
 }
@@ -97,7 +97,7 @@ function getColorTokens( themeColors: themeColorType ) {
     }
     return agg;
   };
-  const tokens = processScssFile( path.join( SCSS_TOKENS_DIR_PATH, '_color.scss' ), processColorTokenLine );
+  const tokens = processScssFile( path.join( getScssTokensDirPath( CORE_DIR_PATH ), '_color.scss' ), processColorTokenLine );
 
   const color_tokens = Object.entries( tokens ).reduce( ( agg: themeColorType, [ key, value ] ) => {
     agg.lightTheme[ key ] = lightTheme[ value as string ];
@@ -119,7 +119,7 @@ function getAccentTokenColors() {
 
   const breakCondition = ( line: string ) => line.trim().startsWith( '$accent-color-map' );
 
-  const tokens = processScssFile( path.join( SCSS_TOKENS_DIR_PATH, '_accent-color.scss' ), processLine, breakCondition );
+  const tokens = processScssFile( path.join( getScssTokensDirPath( CORE_DIR_PATH ), '_accent-color.scss' ), processLine, breakCondition );
   return tokens;
 }
 
@@ -134,7 +134,7 @@ function getOverlayTokens() {
 
   const breakCondition = ( line: string ) => line.trim().startsWith( '$color-map' );
 
-  const tokens = processScssFile( path.join( SCSS_TOKENS_DIR_PATH, '_overlay-color.scss' ), processLine, breakCondition );
+  const tokens = processScssFile( path.join( getScssTokensDirPath( CORE_DIR_PATH ), '_overlay-color.scss' ), processLine, breakCondition );
   return tokens;
 }
 
@@ -147,14 +147,6 @@ function getChartTokens() {
     return agg;
   };
 
-  const tokens = processScssFile( path.join( SCSS_TOKENS_DIR_PATH, '_chart-color.scss' ), processLine );
+  const tokens = processScssFile( path.join( getScssTokensDirPath( CORE_DIR_PATH ), '_chart-color.scss' ), processLine );
   return tokens;
 }
-
-function main() {
-  const themeColors = getThemeBasedColors();
-  const colorTokens = getColorTokens( themeColors );
-
-  console.log( colorTokens );
-}
-main();

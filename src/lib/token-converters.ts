@@ -43,7 +43,7 @@ export function convertToSpacingToken( value: string ) {
   }
 
   for ( let i = 0; i < SPACING_BREAKPOINTS.length; i++ ) {
-    const currentBreakpoint = SPACING_BREAKPOINTS[ i ] as keyof typeof SPACING_TOKENS;
+    const currentBreakpoint = SPACING_BREAKPOINTS[ i ] as number;
     const currentToken = SPACING_TOKENS[ currentBreakpoint ];
 
     if ( i === 0 ) {
@@ -71,8 +71,8 @@ export function convertToSpacingToken( value: string ) {
 
       break;
     } else {
-      const lowerBound = SPACING_BREAKPOINTS[ i - 1 ] as keyof typeof SPACING_TOKENS;
-      const upperBound = SPACING_BREAKPOINTS[ i + 1 ] as keyof typeof SPACING_TOKENS;
+      const lowerBound = SPACING_BREAKPOINTS[ i - 1 ] as number;
+      const upperBound = SPACING_BREAKPOINTS[ i + 1 ] as number;
 
       //if the value is between two breakpoints, then approximate to the nearest breakpoint
       if ( lowerBound <= pxValue && pxValue <= upperBound ) {

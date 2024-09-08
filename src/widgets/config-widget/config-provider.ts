@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { APP_CONFIG_KEYS, appConfig } from '../../lib/config';
-import { getNonce } from '../../utils';
+import { getNonce, validatePathForCoreLib } from '../../utils';
 
 function getWebViewContent( webview: vscode.Webview, extensionUri: vscode.Uri ) {
   const mainStyleUri = webview.asWebviewUri( vscode.Uri.joinPath( extensionUri, 'media', 'main.css' ) );
@@ -15,7 +15,7 @@ function getWebViewContent( webview: vscode.Webview, extensionUri: vscode.Uri ) 
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="Content-Security-Policy"  content="default-src 'none'; img-src ${webview.cspSource}; style-src ${ webview.cspSource } 'nonce-${ nonce }'; script-src 'nonce-${ nonce }';">
+        <meta http-equiv="Content-Security-Policy"  content="default-src 'none'; img-src ${ webview.cspSource }; style-src ${ webview.cspSource } 'nonce-${ nonce }'; script-src 'nonce-${ nonce }';">
         <link rel='stylesheet' href='${ mainStyleUri }'>
         <title>Document</title>
       </head>
@@ -28,6 +28,8 @@ function getWebViewContent( webview: vscode.Webview, extensionUri: vscode.Uri ) 
             <img src="${ openSettingsSvg }" alt='open-settings'>
             </button>
           </div>
+          <span class='warning' id='lib-location-invalid'>Core lib location invalid!</span>
+          <span class='success' id='lib-location-valid'>Core lib location valid!</span> 
         </div>
         <script nonce="${ nonce }" src="${ scriptUri }"></script>
       </body>
@@ -52,21 +54,31 @@ export class ConfigProvider implements vscode.WebviewViewProvider {
     };
 
     appConfig.subscribe( ( values ) => {
-      if ( values[ APP_CONFIG_KEYS.CORE_LIB_LOCATION ] ) {
-        webviewView.webview.postMessage( { command: 'UPDATE_CORE_LIB_LOCATION', args: values[ APP_CONFIG_KEYS.CORE_LIB_LOCATION ] } );
+      webviewView.webview.postMessage( { command: 'UPDATE_CORE_LIB_LOCATION', args: values[ APP_CONFIG_KEYS.CORE_LIB_LOCATION ] } );
+      webviewView.webview.postMessage( { command: 'UPDATE_CORE_LIB_VALID', args: values[ APP_CONFIG_KEYS.IS_VALID_CORE_LOCATION ] } );
+    } );
+
+    webviewView.webview.onDidReceiveMessage( message => {
+      switch ( message.command ) {
+        case 'OPEN_CORE_LIB_SETTINGS': {
+          vscode.commands.executeCommand( 'workbench.action.openSettings', 'mxtsDesignTools.coreLibLocation' );
+        }
       }
     } );
 
-    webviewView.webview.onDidReceiveMessage(message =>{
-      switch(message.command){
-        case 'OPEN_CORE_LIB_SETTINGS' :{
-          vscode.commands.executeCommand('workbench.action.openSettings','mxtsDesignTools.coreLibLocation');
-        }
-      }
-    });
-
     webviewView.webview.html = getWebViewContent( webviewView.webview, this._extensionUri );
+
+    //To set the initial state
     webviewView.webview.postMessage( { command: 'UPDATE_CORE_LIB_LOCATION', args: appConfig.value[ APP_CONFIG_KEYS.CORE_LIB_LOCATION ] } );
+    webviewView.webview.postMessage( { command: 'UPDATE_CORE_LIB_VALID', args: appConfig.value[ APP_CONFIG_KEYS.IS_VALID_CORE_LOCATION ] } );
+
+    //to restore the state when the webview is closed and then reopened
+    webviewView.onDidChangeVisibility( () => {
+      if ( webviewView.visible ) {
+        webviewView.webview.postMessage( { command: 'UPDATE_CORE_LIB_LOCATION', args: appConfig.value[ APP_CONFIG_KEYS.CORE_LIB_LOCATION ] } );
+        webviewView.webview.postMessage( { command: 'UPDATE_CORE_LIB_VALID', args: appConfig.value[ APP_CONFIG_KEYS.IS_VALID_CORE_LOCATION ] } );
+      }
+    } );
   }
 
 }
