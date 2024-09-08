@@ -3,6 +3,7 @@
   const convertButton = document.querySelector( '#convert-button' );
   const inputValue = document.querySelector( '#value-input' );
   const resultTextArea = document.querySelector( '#convert-result-textarea' );
+  const remView = document.querySelector( '#rem-value' );
 
   convertButton.addEventListener( 'click', () => {
     const inputValueText = inputValue.value;
@@ -27,6 +28,15 @@
 
   window.addEventListener( 'message', event => {
     const { args, command } = event.data;
-    resultTextArea.value = args;
+    switch ( command ) {
+      case 'CONVERT_SPACING': {
+        resultTextArea.value = args;
+        break;
+      }
+      case 'UPDATE_REM': {
+        remView.innerHTML = args;
+        break;
+      }
+    }
   } );
 } )();

@@ -13,6 +13,7 @@ appConfig.appConfig.subscribe( ( values ) => {
     } );
     SPACING_BREAKPOINTS = Object.keys( SPACING_TOKENS ).sort( ( a, b ) => Number( a ) - Number( b ) ).map( Number );
   }
+  BASE_REM_VALUE = Number(values.BASE_REM_VALUE);
 } );
 
 

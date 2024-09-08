@@ -22,12 +22,6 @@ const TOKEN_CONFIG_PATH = path.join( os.homedir(), '.mxts-design-tools', 'token-
 // Your extension is activated the very first time the command is executed
 export function activate( context: vscode.ExtensionContext ) {
 	checkTokenConfigDirectory();
-	const tokenConfig = getDataFromTokenConfig();
-	if ( tokenConfig && Object.keys( tokenConfig ).length ) {
-
-	}
-
-
 	setAppConfig();
 	vscode.workspace.onDidChangeConfiguration( ( event ) => {
 		if ( event.affectsConfiguration( 'mxtsDesignTools' ) ) {
@@ -44,19 +38,22 @@ export function activate( context: vscode.ExtensionContext ) {
 function setAppConfig() {
 	const appSettings = vscode.workspace.getConfiguration( 'mxtsDesignTools', null );
 	const coreLibLocation = appSettings.get( 'coreLibLocation' );
+	const baseREMValue = appSettings.get( 'baseREMValue' );
 	const isValidCoreLibLocation = utils.validatePathForCoreLib( coreLibLocation as string );
 	appConfig.updateAppConfig( appConfig.APP_CONFIG_KEYS.CORE_LIB_LOCATION, coreLibLocation );
 	appConfig.updateAppConfig( appConfig.APP_CONFIG_KEYS.IS_VALID_CORE_LOCATION, isValidCoreLibLocation );
+	appConfig.updateAppConfig( appConfig.APP_CONFIG_KEYS.IS_TOKEN_CONFIG_LOADED, false );
+	appConfig.updateAppConfig( appConfig.APP_CONFIG_KEYS.BASE_REM_VALUE, baseREMValue );
 
-	if ( isValidCoreLibLocation && !appConfig.appConfig.value.IS_TOKEN_CONFIG_LOADED ) {
+	if ( isValidCoreLibLocation ) {
 		let tokenData = getDataFromTokenConfig();
 		if ( !tokenData || !Object.keys( tokenData ).length ) {
 			const parsedTokenData = parseTokens( coreLibLocation as string );
-			saveDataToTokenConfig(parsedTokenData);
+			saveDataToTokenConfig( parsedTokenData );
 			tokenData = parsedTokenData;
 		}
-		appConfig.updateAppConfig(appConfig.APP_CONFIG_KEYS.SPACING_TOKENS, tokenData);
-		appConfig.updateAppConfig(appConfig.APP_CONFIG_KEYS.IS_TOKEN_CONFIG_LOADED, true);
+		appConfig.updateAppConfig( appConfig.APP_CONFIG_KEYS.SPACING_TOKENS, tokenData );
+		appConfig.updateAppConfig( appConfig.APP_CONFIG_KEYS.IS_TOKEN_CONFIG_LOADED, true );
 	}
 }
 

@@ -16,13 +16,23 @@
   "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
-    "configuration":[
+    "configuration": [
       {
         "title": "MXTS Core library location",
         "properties": {
-          "mxtsDesignTools.coreLibLocation" : {
-            "type":"string",
+          "mxtsDesignTools.coreLibLocation": {
+            "type": "string",
             "description": "Location of the MXTS Core library, the extension will parse the design tokens present in this directory"
+          }
+        }
+      },
+      {
+        "title": "Base REM value",
+        "properties": {
+          "mxtsDesignTools.baseREMValue": {
+            "type": "number",
+            "description": "Determines the value of 1REM in px, essential for correct conversion to token values as different browsers may have different base REM value.",
+            "default": 16
           }
         }
       }
@@ -35,7 +45,8 @@
           "icon": "media/pen-drawing-icon.svg",
           "contextualTitle": "Converts rem or px values to spacing design tokens",
           "type": "webview"
-        },{
+        },
+        {
           "id": "config-provider",
           "name": "Extension configuration",
           "icon": "media/pen-drawing-icon.svg",
