@@ -1,9 +1,20 @@
-import {BehaviorSubject} from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
+export type AppConfigType = {
+  BASE_REM_VALUE: number,
+  CORE_LIB_LOCATION: string | null,
+  [key: string]: any,
+};
 
-const CONFIG = {
+export const APP_CONFIG_KEYS = {
+  'BASE_REM_VALUE': 'BASE_REM_VALUE',
+  'CORE_LIB_LOCATION': 'CORE_LIB_LOCATION'
+};
+
+const CONFIG: AppConfigType = {
   BASE_REM_VALUE: 16,
-  SPACING_TOKENS : {
+  CORE_LIB_LOCATION: null,
+  SPACING_TOKENS: {
     32: '$spacing-3xl',
     16: '$spacing-l',
     12: '$spacing-m',
@@ -16,4 +27,13 @@ const CONFIG = {
   }
 };
 
-export const appConfig = new BehaviorSubject(CONFIG);
+export const appConfig = new BehaviorSubject( CONFIG );
+
+export function updateAppConfig(key: string, value: any) {
+  appConfig.next(
+    {
+      ...appConfig.value,
+      [key]: value
+    }
+  );
+}

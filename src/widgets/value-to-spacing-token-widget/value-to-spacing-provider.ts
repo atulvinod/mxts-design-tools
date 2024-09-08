@@ -7,7 +7,7 @@ const {BASE_REM_VALUE} = appConfig.value;
 
 function getWebViewContent( webview: vscode.Webview, extensionUri: vscode.Uri ) {
   const mainStyleUri = webview.asWebviewUri( vscode.Uri.joinPath( extensionUri, 'media', 'main.css' ) );
-  const scriptUri = webview.asWebviewUri( vscode.Uri.joinPath( extensionUri, 'src', 'widgets', 'value-to-spacing-token', 'webview-script.js' ) );
+  const scriptUri = webview.asWebviewUri( vscode.Uri.joinPath( extensionUri, 'src', 'widgets', 'value-to-spacing-token-widget', 'webview-script.js' ) );
   // Use CSP to allow loading of resources
   const nonce = getNonce();
 

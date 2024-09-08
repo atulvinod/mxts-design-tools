@@ -43,6 +43,10 @@ textarea {
   flex-direction: row;
 }
 
+.d-flex-col {
+  flex-direction: column;
+}
+
 .w-100 {
   width: 100%;
 }
@@ -58,4 +62,26 @@ textarea {
 
 .no-resize {
   resize: none;
+}
+
+.visibility-hidden{
+  visibility: hidden;
+}
+
+.d-none {
+  display: none;
+}
+
+.my-10{
+  margin-block: 10px;
+}
+
+.my-5 {
+  margin-block: 5px;
+}
+
+.icon-button {
+  height: 2rem;
+    padding: 0;
+    color: white;
 }
