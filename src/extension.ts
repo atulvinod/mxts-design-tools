@@ -53,6 +53,7 @@ function setAppConfig() {
 		if ( !tokenData || !Object.keys( tokenData ).length ) {
 			const parsedTokenData = parseTokens( coreLibLocation as string );
 			saveDataToTokenConfig(parsedTokenData);
+			tokenData = parsedTokenData;
 		}
 		appConfig.updateAppConfig(appConfig.APP_CONFIG_KEYS.SPACING_TOKENS, tokenData);
 		appConfig.updateAppConfig(appConfig.APP_CONFIG_KEYS.IS_TOKEN_CONFIG_LOADED, true);
@@ -75,7 +76,7 @@ function checkTokenConfigDirectory() {
 
 function getDataFromTokenConfig() {
 	if ( !fs.existsSync( TOKEN_CONFIG_PATH ) ) {
-		return null;
+		return {};
 	}
 	const data = fs.readFileSync( TOKEN_CONFIG_PATH, 'utf-8' );
 
@@ -84,7 +85,7 @@ function getDataFromTokenConfig() {
 		return parsedData;
 	} catch ( error ) {
 		console.error( 'Failed to parse config file ', error );
-		return null;
+		return {};
 	}
 }
 
