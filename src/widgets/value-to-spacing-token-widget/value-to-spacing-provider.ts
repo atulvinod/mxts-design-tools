@@ -69,6 +69,9 @@ export class ValueToSpacingTokenProvider implements vscode.WebviewViewProvider {
       localResourceRoots: [ this._extensionUri ]
     };
 
+    //Initial state
+    webviewView.webview.postMessage( { command: "UPDATE_REM", args: appConfig.value.BASE_REM_VALUE } );
+
     appConfig.subscribe( ( values ) => {
       if ( !values.IS_VALID_CORE_LOCATION ) {
         webviewView.webview.html = getUnConfiguredContent( webviewView.webview, this._extensionUri );
@@ -88,5 +91,11 @@ export class ValueToSpacingTokenProvider implements vscode.WebviewViewProvider {
         }
       }
     );
+
+    webviewView.onDidChangeVisibility(() => {
+      if(webviewView.visible){
+        webviewView.webview.postMessage( { command: "UPDATE_REM", args: appConfig.value.BASE_REM_VALUE } );
+      }
+    });
   }
 }
