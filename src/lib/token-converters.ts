@@ -102,7 +102,7 @@ export function convertToSpacingToken( value: string ) {
             result = getSpacingToken( isNegative, SPACING_TOKENS[ lowerBound ], multiplier );
 
           } else {
-            const multiplier = ( upperBound / pxValue ).toPrecision( 3 );
+            const multiplier = ( pxValue / upperBound ).toPrecision( 3 );
             result = getSpacingToken( isNegative, SPACING_TOKENS[ upperBound ], multiplier );
 
           }
