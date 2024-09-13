@@ -1,20 +1,13 @@
 import * as path from 'path';
 import * as fs from 'fs';
 
+import { trimRemCalc, trimVar, getTokenAndValue, convertValueToRGBA, RGBAValue } from './utils';
+
 export const getDesignTokenDirPath = ( coreDirPath: string ) => path.join( coreDirPath, 'lib', 'design-tokens', 'src' );
+
 export const getScssTokensDirPath = ( coreDirPath: string ) => path.join( getDesignTokenDirPath( coreDirPath ), 'scss-tokens' );
 
-function trimRemCalc( value: string ) {
-  return value.replace( 'rem-calc(', '' ).replace( ')', '' );
-}
-
-function trimVar( value: string ) {
-  return value.replace( 'var(', '' ).replace( ')', '' );
-}
-
-function getTokenAndValue( line: string ) {
-  return line.split( ':' ).map( v => v.trim().replace( ';', '' ) );
-}
+type themeColorType = { lightTheme: { [ key: string ]: string }, darkTheme: { [ key: string ]: string } };
 
 function getRootColors( rootColorFilePath: string ) {
   const processColorLine = ( line: string, agg: { [ key: string ]: string } ) => {
@@ -42,7 +35,7 @@ function getRootColors( rootColorFilePath: string ) {
 }
 
 function processScssFile( filePath: string, processLineCallback: ( a0: string, a1: { [ key: string ]: string } ) => { [ key: string ]: string }, breakConditionCallback?: ( a0: string ) => boolean ) {
-  let agg = {};
+  let agg: { [ key: string ]: string } = {};
   const file = fs.readFileSync( filePath, 'utf8' );
   const fileLines = file.split( '\n' );
   for ( let line of fileLines ) {
@@ -83,8 +76,6 @@ function getRadiusAndSpacingTokens( coreDirPath: string ) {
   return { radiusTokens, spacingTokens };
 }
 
-type themeColorType = { lightTheme: { [ key: string ]: string }, darkTheme: { [ key: string ]: string } };
-
 function getColorTokens( themeColors: themeColorType, coreDirPath: string ) {
   const { lightTheme, darkTheme } = themeColors;
 
@@ -98,9 +89,9 @@ function getColorTokens( themeColors: themeColorType, coreDirPath: string ) {
   };
   const tokens = processScssFile( path.join( getScssTokensDirPath( coreDirPath ), '_color.scss' ), processColorTokenLine );
 
-  const color_tokens = Object.entries( tokens ).reduce( ( agg: themeColorType, [ key, value ] ) => {
-    agg.lightTheme[ key ] = lightTheme[ value as string ];
-    agg.darkTheme[ key ] = darkTheme[ value as string ];
+  const color_tokens = Object.entries( tokens ).reduce( ( agg: { lightTheme: { [ key: string ]: RGBAValue }, darkTheme: { [ key: string ]: RGBAValue } }, [ key, value ] ) => {
+    agg.lightTheme[ key ] = convertValueToRGBA( lightTheme[ value as string ] );
+    agg.darkTheme[ key ] = convertValueToRGBA( darkTheme[ value as string ] );
     return agg;
   }, { lightTheme: {}, darkTheme: {} } );
 
