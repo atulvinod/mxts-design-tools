@@ -10,6 +10,7 @@
   colorInput.on( 'input', ( event ) => {
     const value = event.target.value;
     colorPreview.css( 'background-color', value );
+    const mode = $('input[name="color-mode"]:checked').val();
     postMessageToVs( 'GET_RESULT', value );
   } );
 

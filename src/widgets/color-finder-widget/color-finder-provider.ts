@@ -31,6 +31,16 @@ function getWebviewContent( webview: vscode.Webview, extensionUri: vscode.Uri ) 
               <span class='warning-subtext' id='invalid-value'>Invalid color value</span><br>
               <span class='info-subtext'>Results are sorted starting from the closest color</span>
               <hr>
+              <div class='d-flex my-10'>
+                <div class='color-mode-selector'>
+                  <label for='mode-light'>Light mode tokens</label>
+                  <input type='radio' name='color-mode' value='light' id='mode-light' checked>
+                </div>
+                <div class='color-mode-selector mx-5'>
+                  <label for='mode-dark'>Dark mode tokens</label>
+                  <input type='radio' name='color-mode' value='dark' id='mode-dark'>
+                </div>
+              </div>
               <div id='finder-results'>
               </div>
             </body>
@@ -59,10 +69,11 @@ export class ColorTokenFinderProvider implements vscode.WebviewViewProvider {
     webviewView.webview.onDidReceiveMessage( message => {
       switch ( message.command ) {
         case 'GET_RESULT': {
-          const colorTokens = getNearestColorTokens( message.args );
+          const {value, mode} = message.args;
+          const colorTokens = getNearestColorTokens( value, mode );
           if ( colorTokens instanceof Error && colorTokens.message === 'INVALID_VALUE' ) {
             webviewView.webview.postMessage( { command: 'INVALID_VALUE', args: null } );
-          }else{
+          } else {
             webviewView.webview.postMessage( { command: 'RESULTS', args: colorTokens } );
           }
         }
