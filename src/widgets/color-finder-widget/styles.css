@@ -1,0 +1,58 @@
+#color-input-row {
+  display: flex;
+}
+
+#color-input {
+  flex: 1;
+}
+
+#color-preview-container {
+  width: 1.2rem;
+  height: 1.2rem;
+  border: thin solid lightgrey;
+  border-radius: 5px;
+  padding: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#color-preview {
+  width: 1.1rem;
+  height: 1.1rem;
+  background-color: white;
+  border-radius: 2px;
+}
+
+.color-result-container {
+  background-color: var(--vscode-input-background);
+  display: flex;
+  margin-top: 2px;
+  align-items: center;
+  padding-inline: 4px;
+  padding-block: 2px;
+}
+
+.color-result-token-name {
+  font-family: monospace;
+  color: orange;
+  flex: 1;
+}
+
+.color-result-overview-container {
+  border-radius: 5px;
+  padding: 2px;
+  display: flex;
+  background: var(--vscode-editorHoverWidget-background);
+  border: thin solid gray;
+  padding-inline: 5px;
+  
+}
+
+.color-result-overview{
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  margin-right: 5px;
+  margin-block: auto;
+}

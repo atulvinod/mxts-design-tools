@@ -24,7 +24,7 @@ function getMainWebViewContent( webview: vscode.Webview, extensionUri: vscode.Ur
                 <button id='convert-button'>Convert</button>
               </div>
               <textarea rows="5" class='w-95 convert-result-textarea no-resize' placeholder='Result' readonly id='convert-result-textarea'></textarea>
-              <span class='text-subtext'>1REM = <span id="rem-value"></span>px</span>
+              <span class='info-subtext'>1REM = <span id="rem-value" '></span>px</span>
             </body>
             <script src="${ scriptUri }" nonce="${ nonce }"></script>
           </html>

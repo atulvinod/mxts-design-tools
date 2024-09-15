@@ -64,7 +64,7 @@ textarea {
   resize: none;
 }
 
-.visibility-hidden{
+.visibility-hidden {
   visibility: hidden;
 }
 
@@ -76,7 +76,7 @@ textarea {
   display: block;
 }
 
-.my-10{
+.my-10 {
   margin-block: 10px;
 }
 
@@ -86,8 +86,8 @@ textarea {
 
 .icon-button {
   height: 2rem;
-    padding: 0;
-    color: white;
+  padding: 0;
+  color: white;
 }
 
 .warning {
@@ -96,4 +96,16 @@ textarea {
 
 .success {
   color: var(--vscode-errorLens-hintForeground);
+}
+
+.info-subtext {
+  font-size: 10px;
+  font-style: italic;
+  color: var(--vscode-descriptionForeground);
+}
+
+.warning-subtext {
+  font-size: 10px;
+  font-style: italic;
+  color: var(--vscode-errorForeground);
 }

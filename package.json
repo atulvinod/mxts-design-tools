@@ -48,6 +48,13 @@
           "icon": "media/pen-drawing-icon.svg",
           "contextualTitle": "Configures the extension",
           "type": "webview"
+        },
+        {
+          "id": "color-token-finder-provider",
+          "name": "Color token finder",
+          "icon": "media/pen-drawing-icon.svg",
+          "contextualTitle": "Tool to find the color token",
+          "type": "webview"
         }
       ]
     },

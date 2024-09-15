@@ -9,11 +9,13 @@ import * as os from 'os';
 import * as path from 'path';
 import * as fs from 'fs';
 import { parseTokens } from './lib/token-parser';
+import { ColorTokenFinderProvider } from './widgets/color-finder-widget/color-finder-provider';
 
 const WIDGET_PROVIDERS: { [ provider: string ]: ( uri: vscode.Uri ) => vscode.WebviewViewProvider } =
 {
 	[ ValueToSpacingTokenProvider.PROVIDER_ID ]: ( extensionUri: vscode.Uri ) => new ValueToSpacingTokenProvider( extensionUri ),
-	[ ConfigProvider.PROVIDER_ID ]: ( extensionUri: vscode.Uri ) => new ConfigProvider( extensionUri )
+	[ ConfigProvider.PROVIDER_ID ]: ( extensionUri: vscode.Uri ) => new ConfigProvider( extensionUri ),
+	[ ColorTokenFinderProvider.PROVIDER_ID ]: ( extensionUri: vscode.Uri ) => new ColorTokenFinderProvider( extensionUri ),
 };
 
 const TOKEN_CONFIG_PATH = path.join( os.homedir(), '.mxts-design-tools', 'token-config.json' );
@@ -52,7 +54,8 @@ function setAppConfig() {
 			saveDataToTokenConfig( parsedTokenData );
 			tokenData = parsedTokenData;
 		}
-		appConfig.updateAppConfig( appConfig.APP_CONFIG_KEYS.SPACING_TOKENS, tokenData );
+		appConfig.updateAppConfig( appConfig.APP_CONFIG_KEYS.SPACING_TOKENS, tokenData[ appConfig.APP_CONFIG_KEYS.SPACING_TOKENS ] );
+		appConfig.updateAppConfig( appConfig.APP_CONFIG_KEYS.COLOR_TOKENS, tokenData[ appConfig.APP_CONFIG_KEYS.COLOR_TOKENS ] );
 		appConfig.updateAppConfig( appConfig.APP_CONFIG_KEYS.IS_TOKEN_CONFIG_LOADED, true );
 	}
 }

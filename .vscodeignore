@@ -16,3 +16,4 @@ vsc-extension-quickstart.md
 !dist/**
 !media/**
 !src/**
+!deps/**

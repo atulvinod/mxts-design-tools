@@ -1,17 +1,17 @@
-export function trimRemCalc ( value: string ) {
+export function trimRemCalc( value: string ) {
   return value.replace( 'rem-calc(', '' ).replace( ')', '' );
 }
 
-export function trimVar ( value: string ) {
+export function trimVar( value: string ) {
   return value.replace( 'var(', '' ).replace( ')', '' );
 }
 
-export function getTokenAndValue ( line: string ) {
+export function getTokenAndValue( line: string ) {
   return line.split( ':' ).map( v => v.trim().replace( ';', '' ) );
 }
 
 export type RGBAValue = {
-  rgba :{
+  rgba: {
     r: number,
     g: number,
     b: number,
@@ -20,10 +20,15 @@ export type RGBAValue = {
   original: string
 } | null;
 
-export function convertValueToRGBA ( value: string ) : RGBAValue {
+export function convertValueToRGBA( value: string ): RGBAValue {
+
+  if ( !value.startsWith( '#' ) && !value.startsWith( 'rgba' ) && !value.startsWith( 'rgb' ) ) {
+    throw new Error( 'INVALID_VALUE' );
+  }
+
   if ( value.startsWith( '#' ) ) {
     if ( value.length < 7 ) {
-      throw new Error( 'Invalid hex value' );
+      throw new Error( 'INVALID_VALUE' );
     }
     const hex = value.replace( /^#/, '' );
     let r = parseInt( hex.substring( 0, 2 ), 16 );
@@ -38,7 +43,7 @@ export function convertValueToRGBA ( value: string ) : RGBAValue {
     const rgb = value.replace( 'rgb(', '' ).replace( ')', '' ).split( ',' ).map( ( x ) => Number( x.trim() ) );
 
     if ( rgb.length !== 3 ) {
-      throw new Error( 'Invalid rgb value' );
+      throw new Error( 'INVALID_VALUE' );
     }
 
     const [ r, g, b, ] = rgb;
@@ -47,7 +52,7 @@ export function convertValueToRGBA ( value: string ) : RGBAValue {
     const rgba = value.replace( 'rgba(', '' ).replace( ')', '' ).split( ',' ).map( ( x ) => Number( x.trim() ) );
 
     if ( rgba.length !== 4 ) {
-      throw new Error( 'Invalid rgba value' );
+      throw new Error( 'INVALID_VALUE' );
     }
 
     const [ r, g, b, a ] = rgba;

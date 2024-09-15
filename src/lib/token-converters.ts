@@ -1,19 +1,22 @@
 import * as appConfig from './config';
+import { convertValueToRGBA, RGBAValue } from './utils';
 
 let BASE_REM_VALUE = 16;
 let SPACING_TOKENS: { [ key: string ]: string } = {};
 let SPACING_BREAKPOINTS: number[] = [];
+let COLOR_TOKENS: { lightTheme: { [ key: string ]: RGBAValue }, darkTheme: { [ key: string ]: RGBAValue } } = { lightTheme: {}, darkTheme: {} };
 
 appConfig.appConfig.subscribe( ( values ) => {
   if ( values.IS_TOKEN_CONFIG_LOADED ) {
-    const spacingTokens = values[ appConfig.APP_CONFIG_KEYS.SPACING_TOKENS ]['SPACING_TOKENS'];
+    const spacingTokens = values[ appConfig.APP_CONFIG_KEYS.SPACING_TOKENS ];
+    COLOR_TOKENS = values[ appConfig.APP_CONFIG_KEYS.COLOR_TOKENS ] ?? { lightTheme: {}, darkTheme: {} };
     Object.entries( spacingTokens ).forEach( ( [ token, unitPxValue ] ) => {
       const nonPxVal = ( unitPxValue as string ).replace( 'px', '' );
       SPACING_TOKENS[ nonPxVal ] = token;
     } );
     SPACING_BREAKPOINTS = Object.keys( SPACING_TOKENS ).sort( ( a, b ) => Number( a ) - Number( b ) ).map( Number );
   }
-  BASE_REM_VALUE = Number(values.BASE_REM_VALUE);
+  BASE_REM_VALUE = Number( values.BASE_REM_VALUE );
 } );
 
 
@@ -114,4 +117,61 @@ export function convertToSpacingToken( value: string ) {
   }
 
   return result;
+}
+
+function findNearestColor( colorToFind: RGBAValue, allColorTokens: { [ key: string ]: RGBAValue, } ) {
+  let result: {
+    tokenName: string,
+    difference: number,
+    rgba: {
+      r: number,
+      g: number,
+      b: number,
+      a: number
+    },
+    original: string
+  }[] = [];
+
+  Object.entries( allColorTokens ).forEach( ( [ tokenName, tokenConfig ] ) => {
+
+    if ( !tokenConfig || !colorToFind ) {
+      return;
+    }
+
+    //Finding the euclidean distance
+    const R = Math.pow( ( colorToFind.rgba.r - tokenConfig.rgba.r ), 2 );
+    const G = Math.pow( ( colorToFind.rgba.g - tokenConfig.rgba.g ), 2 );
+    const B = Math.pow( ( colorToFind.rgba.b - tokenConfig.rgba.b ), 2 );
+    const A = Math.pow( ( colorToFind.rgba.a - tokenConfig.rgba.a ), 2 );
+
+    const difference = Math.sqrt( R + G + B + A );
+    result.push( {
+      tokenName,
+      difference,
+      rgba: tokenConfig.rgba,
+      original: tokenConfig.original
+    } );
+  } );
+
+  //sort descending on difference
+  const finalResultSet = result.sort( ( a, b ) => a.difference - b.difference ).slice( 0, 11 );
+  return finalResultSet;
+}
+
+export function getNearestColorTokens( colorValue: string, mode = 'light' ) {
+  try {
+    const rgba = convertValueToRGBA( colorValue );
+    const allLightTheme = { ...COLOR_TOKENS.lightTheme };
+    const allDarkTheme = { ...COLOR_TOKENS.darkTheme };
+
+    if ( mode === 'light' ) {
+      const colors = findNearestColor( rgba, allLightTheme );
+      return colors;
+    } else {
+      const colors = findNearestColor( rgba, allDarkTheme );
+      return colors;
+    }
+  } catch ( error ) {
+    return error as Error;
+  }
 }

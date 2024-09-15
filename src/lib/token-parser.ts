@@ -144,8 +144,10 @@ function getChartTokens( coreDirPath: string ) {
 
 export function parseTokens( coreDirPath: string ) {
   const { spacingTokens } = getRadiusAndSpacingTokens( coreDirPath );
-
+  const themeColors = getThemeBasedColors( coreDirPath );
+  const colorTokens = getColorTokens( themeColors, coreDirPath );
   return {
-    SPACING_TOKENS: spacingTokens
+    SPACING_TOKENS: spacingTokens,
+    COLOR_TOKENS:colorTokens
   };
 }
