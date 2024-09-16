@@ -69,13 +69,17 @@ export class ColorTokenFinderProvider implements vscode.WebviewViewProvider {
     webviewView.webview.onDidReceiveMessage( message => {
       switch ( message.command ) {
         case 'GET_RESULT': {
-          const {value, mode} = message.args;
+          const { value, mode } = message.args;
           const colorTokens = getNearestColorTokens( value, mode );
           if ( colorTokens instanceof Error && colorTokens.message === 'INVALID_VALUE' ) {
             webviewView.webview.postMessage( { command: 'INVALID_VALUE', args: null } );
           } else {
             webviewView.webview.postMessage( { command: 'RESULTS', args: colorTokens } );
           }
+          break;
+        }
+        case 'COPY_TO_CLIPBOARD': {
+          vscode.env.clipboard.writeText(message.args );
         }
       }
     } );
