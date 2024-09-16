@@ -11,7 +11,7 @@
     const value = event.target.value;
     colorPreview.css( 'background-color', value );
     const mode = $('input[name="color-mode"]:checked').val();
-    postMessageToVs( 'GET_RESULT', value );
+    postMessageToVs( 'GET_RESULT', {value, mode} );
   } );
 
   window.addEventListener( 'message', event => {
