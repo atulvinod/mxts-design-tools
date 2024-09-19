@@ -76,6 +76,10 @@ textarea {
   display: block;
 }
 
+.d-justify-space-between {
+  justify-content: space-between;
+}
+
 .my-10 {
   margin-block: 10px;
 }
@@ -86,6 +90,10 @@ textarea {
 
 .mx-5 {
   margin-inline: 5px;
+}
+
+.mr-8{
+  margin-right: 8px;
 }
 
 .icon-button {
@@ -112,4 +120,10 @@ textarea {
   font-size: 10px;
   font-style: italic;
   color: var(--vscode-errorForeground);
+}
+
+.secondary-button{
+  color: var(--vscode-textLink-foreground);
+  font-weight: 600;
+  cursor: pointer;
 }

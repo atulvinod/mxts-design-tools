@@ -1,6 +1,8 @@
 import * as vscode from 'vscode';
 import { getNonce } from '../../utils';
 import { getNearestColorTokens } from '../../lib/token-converters';
+import { appConfig } from '../../lib/config';
+import { getUnConfiguredContent } from '../shared/shared-webviews';
 
 function getWebviewContent( webview: vscode.Webview, extensionUri: vscode.Uri ) {
 
@@ -12,39 +14,39 @@ function getWebviewContent( webview: vscode.Webview, extensionUri: vscode.Uri ) 
 
   return `<!DOCTYPE html>
             <html lang="en">
-            <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-               <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${ webview.cspSource } 'unsafe-inline'; script-src 'nonce-${ nonce }';">
-              <link rel='stylesheet' href='${ mainStyleUri }'>
-              <link rel='stylesheet'  href='${ styles }'>
-              <script src="${ jquery }" nonce ="${ nonce }"></script>
-              <title>Document</title>
-            </head>
-            <body>
-              <div class='d-flex' id='color-input-row'>
-                <input type='text' placeholder='HEX or RGBA value...' id='color-input'/>
-                <div id='color-preview-container'>
-                  <span id='color-preview'></span>
+              <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${ webview.cspSource } 'unsafe-inline'; script-src 'nonce-${ nonce }';">
+                <link rel='stylesheet' href='${ mainStyleUri }'>
+                <link rel='stylesheet'  href='${ styles }'>
+                <script src="${ jquery }" nonce ="${ nonce }"></script>
+                <title>Document</title>
+              </head>
+              <body>
+                <div class='d-flex' id='color-input-row'>
+                  <input type='text' placeholder='HEX, RGB, RGBA, $color-token' id='color-input'/>
+                  <div id='color-preview-container'>
+                    <span id='color-preview'></span>
+                  </div>
                 </div>
-              </div>
-              <span class='warning-subtext' id='invalid-value'>Invalid color value</span><br>
-              <span class='info-subtext'>Results are sorted starting from the closest color</span>
-              <hr>
-              <div class='d-flex my-10'>
-                <div class='color-mode-selector'>
-                  <label for='mode-light'>Light mode tokens</label>
-                  <input type='radio' name='color-mode' value='light' id='mode-light' checked>
+                <span class='warning-subtext' id='invalid-value'>Invalid color value</span><br>
+                <span class='info-subtext'>Results are sorted starting from the closest color</span>
+                <hr>
+                <div class='d-flex my-10'>
+                  <div class='color-mode-selector'>
+                    <label for='mode-light'>Light mode tokens</label>
+                    <input type='radio' name='color-mode' value='light' id='mode-light' checked>
+                  </div>
+                  <div class='color-mode-selector mx-5'>
+                    <label for='mode-dark'>Dark mode tokens</label>
+                    <input type='radio' name='color-mode' value='dark' id='mode-dark'>
+                  </div>
                 </div>
-                <div class='color-mode-selector mx-5'>
-                  <label for='mode-dark'>Dark mode tokens</label>
-                  <input type='radio' name='color-mode' value='dark' id='mode-dark'>
+                <div id='finder-results'>
                 </div>
-              </div>
-              <div id='finder-results'>
-              </div>
-            </body>
-            <script src="${ script }" nonce = ${ nonce }></script>
+              </body>
+              <script src="${ script }" nonce = ${ nonce }></script>
             </html>
             `;
 }
@@ -64,7 +66,13 @@ export class ColorTokenFinderProvider implements vscode.WebviewViewProvider {
       localResourceRoots: [ this._extensionUri ]
     };
 
-    webviewView.webview.html = getWebviewContent( webviewView.webview, this._extensionUri );
+    appConfig.subscribe( ( values ) => {
+      if ( !values.IS_VALID_CORE_LOCATION ) {
+        webviewView.webview.html = getUnConfiguredContent( webviewView.webview, this._extensionUri );
+      } else {
+        webviewView.webview.html = getWebviewContent( webviewView.webview, this._extensionUri );
+      }
+    } );
 
     webviewView.webview.onDidReceiveMessage( message => {
       switch ( message.command ) {
@@ -79,7 +87,7 @@ export class ColorTokenFinderProvider implements vscode.WebviewViewProvider {
           break;
         }
         case 'COPY_TO_CLIPBOARD': {
-          vscode.env.clipboard.writeText(message.args );
+          vscode.env.clipboard.writeText( message.args );
         }
       }
     } );

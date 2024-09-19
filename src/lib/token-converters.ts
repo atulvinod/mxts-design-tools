@@ -4,16 +4,21 @@ import { convertValueToRGBA, RGBAValue } from './utils';
 let BASE_REM_VALUE = 16;
 let SPACING_TOKENS: { [ key: string ]: string } = {};
 let SPACING_BREAKPOINTS: number[] = [];
-let COLOR_TOKENS: { lightTheme: { [ key: string ]: RGBAValue }, darkTheme: { [ key: string ]: RGBAValue } } = { lightTheme: {}, darkTheme: {} };
+let COLOR_TOKENS: {
+  lightTheme: { [ key: string ]: RGBAValue },
+  darkTheme: { [ key: string ]: RGBAValue }
+} = { lightTheme: {}, darkTheme: {} };
 
 appConfig.appConfig.subscribe( ( values ) => {
   if ( values.IS_TOKEN_CONFIG_LOADED ) {
     const spacingTokens = values[ appConfig.APP_CONFIG_KEYS.SPACING_TOKENS ];
     COLOR_TOKENS = values[ appConfig.APP_CONFIG_KEYS.COLOR_TOKENS ] ?? { lightTheme: {}, darkTheme: {} };
+
     Object.entries( spacingTokens ).forEach( ( [ token, unitPxValue ] ) => {
       const nonPxVal = ( unitPxValue as string ).replace( 'px', '' );
       SPACING_TOKENS[ nonPxVal ] = token;
     } );
+
     SPACING_BREAKPOINTS = Object.keys( SPACING_TOKENS ).sort( ( a, b ) => Number( a ) - Number( b ) ).map( Number );
   }
   BASE_REM_VALUE = Number( values.BASE_REM_VALUE );
@@ -28,6 +33,10 @@ function getSpacingToken( isNegative: boolean, tokenValue: string, multiplier?: 
   return sign + 'tokens.' + tokenValue;
 }
 
+function getRemCalcValue( pxValue: number ) {
+  return `rem-calc(${ pxValue })`;
+}
+
 /**
  * 
  * @param {string} value 
@@ -36,7 +45,7 @@ export function convertToSpacingToken( value: string ) {
   if ( value.includes( '$' ) || value.includes( 'rem-calc' ) || /[1-9]em$/gi.test( value ) || value.endsWith( 'px' ) ) {
     return value;
   }
-
+  const nonExactToRemCalc = appConfig.appConfig.value[ appConfig.APP_CONFIG_KEYS.NON_EXACT_TOKEN_TO_REM_CALC ];
   value = value.trim().replace( ';', '' );
   const [ unit ] = value.match( /[^0-9]+$/ ) ?? [];
   const [ numericValue ] = value.match( /^-?\d+(\.\d+)?/ ) ?? [];
@@ -65,9 +74,12 @@ export function convertToSpacingToken( value: string ) {
     if ( i === 0 ) {
       // px value is lower than the lowest breakpoint
       if ( pxValue < currentBreakpoint ) {
-        const multiplier = ( currentBreakpoint / pxValue ).toPrecision( 3 );
-        result = getSpacingToken( isNegative, currentToken, multiplier );
-
+        if ( nonExactToRemCalc ) {
+          result = getRemCalcValue( pxValue );
+        } else {
+          const multiplier = ( currentBreakpoint / pxValue ).toPrecision( 3 );
+          result = getSpacingToken( isNegative, currentToken, multiplier );
+        }
         break;
       } else if ( pxValue === currentBreakpoint ) {
         result = getSpacingToken( isNegative, currentToken );
@@ -80,6 +92,8 @@ export function convertToSpacingToken( value: string ) {
        */
       if ( pxValue === currentBreakpoint ) {
         result = getSpacingToken( isNegative, currentToken );
+      } else if ( nonExactToRemCalc ) {
+        result = getRemCalcValue( pxValue );
       } else {
         const multiplier = ( pxValue / currentBreakpoint ).toPrecision( 3 );
         result = getSpacingToken( isNegative, currentToken, multiplier );
@@ -107,10 +121,11 @@ export function convertToSpacingToken( value: string ) {
           } else {
             const multiplier = ( pxValue / upperBound ).toPrecision( 3 );
             result = getSpacingToken( isNegative, SPACING_TOKENS[ upperBound ], multiplier );
-
+          }
+          if ( nonExactToRemCalc ) {
+            result = getRemCalcValue( pxValue );
           }
         }
-
         break;
       }
     }
@@ -159,18 +174,25 @@ function findNearestColor( colorToFind: RGBAValue, allColorTokens: { [ key: stri
 }
 
 export function getNearestColorTokens( colorValue: string, mode = 'light' ) {
-  try {
-    const rgba = convertValueToRGBA( colorValue );
-    const allLightTheme = { ...COLOR_TOKENS.lightTheme };
-    const allDarkTheme = { ...COLOR_TOKENS.darkTheme };
+  const allLightTheme = { ...COLOR_TOKENS.lightTheme };
+  const allDarkTheme = { ...COLOR_TOKENS.darkTheme };
+  const tokens = mode === 'light' ? allLightTheme : allDarkTheme;
 
-    if ( mode === 'light' ) {
-      const colors = findNearestColor( rgba, allLightTheme );
-      return colors;
-    } else {
-      const colors = findNearestColor( rgba, allDarkTheme );
-      return colors;
+  try {
+    if ( colorValue.startsWith( '$' ) ) {
+      const searchString = colorValue.replace( '$', '' );
+      const entries = Object.entries( tokens );
+      return entries.filter( ( [ tokenName ] ) => tokenName.includes( searchString ) ).map( ( [ tokenName, value ] ) => ( {
+        tokenName,
+        rgba: value?.rgba,
+        original: value?.original
+      } ) );
+
     }
+
+    const rgba = convertValueToRGBA( colorValue );
+    const colors = findNearestColor( rgba, tokens );
+    return colors;
   } catch ( error ) {
     return error as Error;
   }

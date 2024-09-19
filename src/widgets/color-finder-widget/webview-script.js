@@ -12,6 +12,9 @@
     colorPreview.css( 'background-color', value );
     const mode = $( 'input[name="color-mode"]:checked' ).val();
     postMessageToVs( 'GET_RESULT', { value, mode } );
+    if ( !value?.length ) {
+      invalidValueSpan.hide();
+    }
   } );
 
   window.addEventListener( 'message', event => {
@@ -24,15 +27,17 @@
           finderResults.append( getResultRow( row ) );
         } );
         const colorResultContainers = $( '.color-result-container' );
-        Array.from(colorResultContainers).forEach( ( container ) => {
-          $(container).on( 'click', () => {
-            postMessageToVs( 'COPY_TO_CLIPBOARD', 'tokens.'+container.dataset.token );
+        Array.from( colorResultContainers ).forEach( ( container ) => {
+          $( container ).on( 'click', () => {
+            postMessageToVs( 'COPY_TO_CLIPBOARD', 'tokens.' + container.dataset.token );
           } );
         } );
         break;
       }
       case 'INVALID_VALUE': {
-        invalidValueSpan.show();
+        if ( colorInput.val() ) {
+          invalidValueSpan.show();
+        }
         finderResults.empty();
         break;
       }
@@ -48,7 +53,7 @@
 
   function getResultRow ( args ) {
     const template = `
-    <div class='color-result-container' data-token="${ args.tokenName }">
+    <div class='color-result-container' data-token="${ args.tokenName }" title='Click to copy'>
       <span class='color-result-token-name'>${ args.tokenName }</span>
       <div class='color-result-overview-container'>
         <span class='color-result-overview' style="background-color: ${ args.original }"></span>

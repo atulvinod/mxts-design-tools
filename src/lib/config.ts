@@ -22,7 +22,8 @@ export const APP_CONFIG_KEYS = {
   'IS_VALID_CORE_LOCATION': 'IS_VALID_CORE_LOCATION',
   'IS_TOKEN_CONFIG_LOADED': 'IS_TOKEN_CONFIG_LOADED',
   'SPACING_TOKENS': 'SPACING_TOKENS',
-  'COLOR_TOKENS': 'COLOR_TOKENS'
+  'COLOR_TOKENS': 'COLOR_TOKENS',
+  'NON_EXACT_TOKEN_TO_REM_CALC': 'NON_EXACT_TOKEN_TO_REM_CALC'
 };
 
 const CONFIG: AppConfigType = {
@@ -47,10 +48,13 @@ export function setAppConfig( forceUpdate: boolean = false ) {
   const appSettings = vscode.workspace.getConfiguration( 'mxtsDesignTools', null );
   const coreLibLocation = appSettings.get( 'coreLibLocation' );
   const baseREMValue = appSettings.get( 'baseREMValue' );
+  const nonExactTokenToRemCalc = appSettings.get( 'nonExactTokenToRemCalc' );
+
   const isValidCoreLibLocation = utils.validatePathForCoreLib( coreLibLocation as string );
   updateAppConfig( APP_CONFIG_KEYS.CORE_LIB_LOCATION, coreLibLocation );
   updateAppConfig( APP_CONFIG_KEYS.IS_VALID_CORE_LOCATION, isValidCoreLibLocation );
   updateAppConfig( APP_CONFIG_KEYS.IS_TOKEN_CONFIG_LOADED, false );
+  updateAppConfig( APP_CONFIG_KEYS.NON_EXACT_TOKEN_TO_REM_CALC, nonExactTokenToRemCalc );
   updateAppConfig( APP_CONFIG_KEYS.BASE_REM_VALUE, baseREMValue );
 
   if ( isValidCoreLibLocation ) {

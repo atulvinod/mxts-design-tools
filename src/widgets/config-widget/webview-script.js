@@ -2,39 +2,48 @@
 (
   function () {
     const vscode = acquireVsCodeApi();
-    const coreLibLocationView = document.querySelector( '#core-lib-location' );
-    const openCoreLibSettingsButton = document.querySelector( '#open-core-lib-settings' );
-    const validCoreLibBanner = document.querySelector( '#lib-location-valid' );
-    const invalidCoreLibBanner = document.querySelector( '#lib-location-invalid' );
-    const baseREMView = document.querySelector( '#base-rem-value' );
-    const updateBaseREMButton = document.querySelector( '#open-base-rem-value' );
+
+    const coreLibLocationView = $( '#core-lib-location' );
+    const openCoreLibSettingsButton = $( '#open-core-lib-settings' );
+    const reloadDataButton = $( '#reload-data' );
+    const validCoreLibBanner = $( '#lib-location-valid' );
+    const invalidCoreLibBanner = $( '#lib-location-invalid' );
+
+    const baseREMView = $( '#base-rem-value' );
+    const updateBaseREMButton = $( '#open-base-rem-value' );
+
+    const updateTokenToRemCalc = $( '#open-rem-calc-non-exact' );
+    const tokenToRemCalcView = $( '#rem-calc-non-exact' );
+
+    validCoreLibBanner.hide();
+    invalidCoreLibBanner.hide();
+    reloadDataButton.hide();
 
     window.addEventListener( 'message', event => {
       const { args, command } = event.data;
       switch ( command ) {
         case "UPDATE_CORE_LIB_LOCATION": {
-          coreLibLocationView.value = args;
+          coreLibLocationView.val( args );
           break;
         }
         case "UPDATE_CORE_LIB_VALID": {
           if ( args ) {
-            validCoreLibBanner.classList.add( 'd-block' );
-            validCoreLibBanner.classList.remove( 'd-none' );
-
-            invalidCoreLibBanner.classList.add( 'd-none' );
-            invalidCoreLibBanner.classList.remove( 'd-block' );
+            validCoreLibBanner.show();
+            invalidCoreLibBanner.hide();
+            reloadDataButton.show();
           } else {
-            validCoreLibBanner.classList.add( 'd-none' );
-            validCoreLibBanner.classList.remove( 'd-block' );
-
-            invalidCoreLibBanner.classList.add( 'd-block' );
-            invalidCoreLibBanner.classList.remove( 'd-none' );
+            validCoreLibBanner.hide();
+            invalidCoreLibBanner.show();
+            reloadDataButton.hide();
           }
           break;
         }
         case "UPDATE_BASE_REM": {
-          baseREMView.value = args;
+          baseREMView.val( args );
           break;
+        }
+        case "UPDATE_NON_EXACT_TOKEN_TO_REM_CALC": {
+          tokenToRemCalcView.val( args );
         }
       }
     } );
@@ -48,12 +57,20 @@
     }
 
 
-    openCoreLibSettingsButton.addEventListener( 'click', () => {
+    openCoreLibSettingsButton.on( 'click', () => {
       postMessageToVs( 'OPEN_CORE_LIB_SETTINGS', null );
     } );
 
-    updateBaseREMButton.addEventListener( 'click', () => {
+    updateBaseREMButton.on( 'click', () => {
       postMessageToVs( 'OPEN_BASE_REM_SETTINGS', null );
+    } );
+
+    reloadDataButton.on( 'click', () => {
+      postMessageToVs( 'RELOAD_CONFIG', null );
+    } );
+
+    updateTokenToRemCalc.on( 'click', () => {
+      postMessageToVs( 'OPEN_NON_EXACT_TO_REM_CALC', null );
     } );
   }
 )();

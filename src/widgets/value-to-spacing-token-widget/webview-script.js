@@ -1,21 +1,29 @@
 ( function () {
   const vscode = acquireVsCodeApi();
-  const convertButton = document.querySelector( '#convert-button' );
-  const inputValue = document.querySelector( '#value-input' );
-  const resultTextArea = document.querySelector( '#convert-result-textarea' );
-  const remView = document.querySelector( '#rem-value' );
+  const convertButton = $( '#convert-button' );
+  const inputValue = $( '#value-input' );
+  const resultTextArea = $( '#convert-result-textarea' );
+  const remView = $( '#rem-value' );
+  const copyTokensToClipboard = $( '#copy-tokens' );
 
-  convertButton.addEventListener( 'click', () => {
-    const inputValueText = inputValue.value;
+  convertButton.on( 'click', () => {
+    const inputValueText = inputValue.val();
     postMessageToVs( 'CONVERT_SPACING', inputValueText );
   } );
 
 
-  inputValue.addEventListener( 'keydown', ( event ) => {
+  inputValue.on( 'keydown', ( event ) => {
     if ( event.key === 'Enter' || event.keyCode === 13 ) {
-      const inputValueText = inputValue.value;
+      const inputValueText = inputValue.val();
       postMessageToVs( 'CONVERT_SPACING', inputValueText );
     }
+  } );
+
+  copyTokensToClipboard.on( 'click', () => {
+    postMessageToVs(
+      'COPY_TO_CLIPBOARD',
+      resultTextArea.val()
+    );
   } );
 
 
@@ -30,11 +38,11 @@
     const { args, command } = event.data;
     switch ( command ) {
       case 'CONVERT_SPACING': {
-        resultTextArea.value = args;
+        resultTextArea.val( args );
         break;
       }
       case 'UPDATE_REM': {
-        remView.innerHTML = args;
+        remView.html( args );
         break;
       }
     }

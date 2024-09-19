@@ -31,6 +31,16 @@
             "default": 16
           }
         }
+      },
+      {
+        "title": "Convert non exact token values to rem-calc equivalents",
+        "properties": {
+          "mxtsDesignTools.nonExactTokenToRemCalc": {
+            "type": "boolean",
+            "description": "If an exact token value is not found for a particular value, then get then `rem-calc` value instead of a calculated token value. For example, for 1.2rem instead of retuning `0.960 * tokens.$spacing-xl;`, we will get `rem-calc(19.2)`",
+            "default": false
+          }
+        }
       }
     ],
     "views": {
