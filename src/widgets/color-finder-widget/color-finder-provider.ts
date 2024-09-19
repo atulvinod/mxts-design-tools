@@ -31,7 +31,7 @@ function getWebviewContent( webview: vscode.Webview, extensionUri: vscode.Uri ) 
                   </div>
                 </div>
                 <span class='warning-subtext' id='invalid-value'>Invalid color value</span><br>
-                <span class='info-subtext'>Results are sorted starting from the closest color</span>
+                <span class='info-subtext'>Directly type the color token starting with $ to get the token value. When finding a token with a similar color, results will be sorted starting from the closest color</span>
                 <hr>
                 <div class='d-flex my-10'>
                   <div class='color-mode-selector'>
