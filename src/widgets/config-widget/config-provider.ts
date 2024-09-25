@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { APP_CONFIG_KEYS, appConfig, setAppConfig, updateAppConfig } from '../../lib/config';
+import { APP_CONFIG_KEYS, appConfig, createErrorLog, setAppConfig, updateAppConfig } from '../../lib/config';
 import { getNonce, validatePathForCoreLib } from '../../utils';
 
 function getWebViewContent( webview: vscode.Webview, extensionUri: vscode.Uri ) {
@@ -94,7 +94,8 @@ export class ConfigProvider implements vscode.WebviewViewProvider {
             setAppConfig( true );
             vscode.window.showInformationMessage( 'The data from core library was reloaded successfully!' );
           } catch ( error ) {
-            vscode.window.showErrorMessage( 'An unexpected error occurred while loading data from core library!' );
+            const logFilePath = createErrorLog((error as Error).stack || (error as Error).message);;
+            vscode.window.showErrorMessage( `An unexpected error occurred while loading data from core library!\nLogs can be found at ${logFilePath}` );
           }
           break;
         }

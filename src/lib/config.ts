@@ -5,6 +5,7 @@ import * as fs from 'fs';
 import { parseTokens } from './token-parser';
 import * as os from 'os';
 import * as path from 'path';
+import { version as extensionVersion } from '../../package.json';
 
 export type AppConfigType = {
   IS_TOKEN_CONFIG_LOADED: boolean
@@ -14,8 +15,8 @@ export type AppConfigType = {
   [ key: string ]: any,
 };
 
-const TOKEN_CONFIG_PATH = path.join( os.homedir(), '.mxts-design-tools', 'token-config.json' );
-
+export const TOKEN_CONFIG_FILE_PATH = path.join( os.homedir(), '.mxts-design-tools', 'token-config.json' );
+export const LOGS_DIR_PATH = path.join( os.homedir(), '.mxts-design-tools', 'logs' );
 export const APP_CONFIG_KEYS = {
   'BASE_REM_VALUE': 'BASE_REM_VALUE',
   'CORE_LIB_LOCATION': 'CORE_LIB_LOCATION',
@@ -23,7 +24,8 @@ export const APP_CONFIG_KEYS = {
   'IS_TOKEN_CONFIG_LOADED': 'IS_TOKEN_CONFIG_LOADED',
   'SPACING_TOKENS': 'SPACING_TOKENS',
   'COLOR_TOKENS': 'COLOR_TOKENS',
-  'NON_EXACT_TOKEN_TO_REM_CALC': 'NON_EXACT_TOKEN_TO_REM_CALC'
+  'NON_EXACT_TOKEN_TO_REM_CALC': 'NON_EXACT_TOKEN_TO_REM_CALC',
+  'ACCENT_TOKENS': 'ACCENT_TOKENS'
 };
 
 const CONFIG: AppConfigType = {
@@ -58,27 +60,28 @@ export function setAppConfig( forceUpdate: boolean = false ) {
   updateAppConfig( APP_CONFIG_KEYS.BASE_REM_VALUE, baseREMValue );
 
   if ( isValidCoreLibLocation ) {
-    let tokenData = getDataFromTokenConfig();
+    let tokenData = getTokenDataFromConfig();
     if ( !tokenData || !Object.keys( tokenData ).length || forceUpdate ) {
       const parsedTokenData = parseTokens( coreLibLocation as string );
-      saveDataToTokenConfig( parsedTokenData );
+      saveTokenDataToConfig( parsedTokenData );
       tokenData = parsedTokenData;
     }
     updateAppConfig( APP_CONFIG_KEYS.SPACING_TOKENS, tokenData[ APP_CONFIG_KEYS.SPACING_TOKENS ] );
     updateAppConfig( APP_CONFIG_KEYS.COLOR_TOKENS, tokenData[ APP_CONFIG_KEYS.COLOR_TOKENS ] );
+    updateAppConfig( APP_CONFIG_KEYS.ACCENT_TOKENS, tokenData[ APP_CONFIG_KEYS.ACCENT_TOKENS] );
     updateAppConfig( APP_CONFIG_KEYS.IS_TOKEN_CONFIG_LOADED, true );
   }
 }
 
-function getDataFromTokenConfig() {
-  if ( !fs.existsSync( TOKEN_CONFIG_PATH ) ) {
+function getTokenDataFromConfig() {
+  if ( !fs.existsSync( TOKEN_CONFIG_FILE_PATH ) ) {
     return {};
   }
-  const data = fs.readFileSync( TOKEN_CONFIG_PATH, 'utf-8' );
+  const data = fs.readFileSync( TOKEN_CONFIG_FILE_PATH, 'utf-8' );
 
   try {
     const parsedData = JSON.parse( data );
-    return parsedData;
+    return parsedData[ 'tokenData' ];
   } catch ( error ) {
     console.error( 'Failed to parse config file ', error );
     return {};
@@ -86,9 +89,13 @@ function getDataFromTokenConfig() {
 }
 
 
-function saveDataToTokenConfig( data: Object ) {
-  if ( fs.existsSync( TOKEN_CONFIG_PATH ) ) {
-    fs.writeFileSync( TOKEN_CONFIG_PATH, JSON.stringify( data ), 'utf-8' );
+function saveTokenDataToConfig( tokenData: Object ) {
+  if ( fs.existsSync( TOKEN_CONFIG_FILE_PATH ) ) {
+    const meta = {
+      extVersion: extensionVersion,
+      timestamp: new Date().toISOString()
+    };
+    fs.writeFileSync( TOKEN_CONFIG_FILE_PATH, JSON.stringify( { tokenData, meta } ), 'utf-8' );
   }
 }
 
@@ -103,4 +110,15 @@ export function checkTokenConfigDirectory() {
   if ( !fs.existsSync( configFile ) ) {
     fs.writeFileSync( configFile, '{}', 'utf-8' );
   }
+}
+
+export function createErrorLog( trace: string ) {
+  if ( !fs.existsSync( LOGS_DIR_PATH ) ) {
+    fs.mkdirSync( LOGS_DIR_PATH, { recursive: true } );
+  }
+
+  const logFileName = `[ERROR] MXTS_DESIGN_TOOL_EXTENSION-${ new Date().toISOString().replace( /:/g, '-' ) }.txt`;
+  const logFilePath = path.join( LOGS_DIR_PATH, logFileName );
+  fs.writeFileSync( logFilePath, trace );
+  return logFilePath;
 }

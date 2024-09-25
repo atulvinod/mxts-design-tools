@@ -26,9 +26,24 @@ export function activate( context: vscode.ExtensionContext ) {
 	} );
 
 
+	//Add all widgets to the context subscription
 	Object.entries( WIDGET_PROVIDERS ).forEach( ( [ key, provider ] ) => {
 		context.subscriptions.push( vscode.window.registerWebviewViewProvider( key, provider( context.extensionUri ) ) );
 	} );
+
+	process.on( 'uncaughtException', ( reason: Error ) => {
+		console.error( 'Uncaught exception', reason );
+		let logFilePath = null;
+		if ( reason instanceof Error ) {
+			logFilePath = appConfig.createErrorLog( reason.stack || reason.message );
+		}
+		if ( !logFilePath ) {
+			vscode.window.showErrorMessage( 'An unexpected error has occurred in Design tools' );
+		} else {
+			vscode.window.showErrorMessage( `An unexpected error has occurred in Design tools\nYou can find the logs at ${ logFilePath }` );
+		}
+	} );
+
 }
 
 export function deactivate() { }

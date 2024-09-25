@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs';
 
-import { trimRemCalc, trimVar, getTokenAndValue, convertValueToRGBA, RGBAValue } from './utils';
+import { trimRemCalc, trimVar, getTokenAndValue, convertValueToRGBA, RGBAValue, lineParseValidator } from './utils';
 
 export const getDesignTokenDirPath = ( coreDirPath: string ) => path.join( coreDirPath, 'lib', 'design-tokens', 'src' );
 
@@ -30,18 +30,19 @@ function getRootColors( rootColorFilePath: string ) {
     return agg;
   };
 
-  const colors = processScssFile( rootColorFilePath, processColorLine );
+  const colors = processScssFile( rootColorFilePath, processColorLine, true );
   return colors;
 }
 
-function processScssFile( filePath: string, processLineCallback: ( a0: string, a1: { [ key: string ]: string } ) => { [ key: string ]: string }, breakConditionCallback?: ( a0: string ) => boolean ) {
+function processScssFile( filePath: string, processLineCallback: ( a0: string, a1: { [ key: string ]: string } ) => { [ key: string ]: string }, disableSkippingWithinBracketContent: boolean = false ) {
   let agg: { [ key: string ]: string } = {};
+  const checkInvalidLine = lineParseValidator();
   const file = fs.readFileSync( filePath, 'utf8' );
   const fileLines = file.split( '\n' );
   for ( let line of fileLines ) {
     line = line.trim();
-    if ( breakConditionCallback && breakConditionCallback( line ) ) {
-      return agg;
+    if ( !disableSkippingWithinBracketContent && checkInvalidLine( line ) ) {
+      continue;
     }
     agg = processLineCallback( line, agg );
   }
@@ -76,7 +77,7 @@ function getRadiusAndSpacingTokens( coreDirPath: string ) {
   return { radiusTokens, spacingTokens };
 }
 
-function getColorTokens( themeColors: themeColorType, coreDirPath: string ) {
+function getColorTokens(fileName: string, themeColors: themeColorType, coreDirPath: string ) {
   const { lightTheme, darkTheme } = themeColors;
 
   const processColorTokenLine = ( line: string, agg: { [ key: string ]: string } ) => {
@@ -87,7 +88,7 @@ function getColorTokens( themeColors: themeColorType, coreDirPath: string ) {
     }
     return agg;
   };
-  const tokens = processScssFile( path.join( getScssTokensDirPath( coreDirPath ), '_color.scss' ), processColorTokenLine );
+  const tokens = processScssFile( path.join( getScssTokensDirPath( coreDirPath ), fileName ), processColorTokenLine );
 
   const color_tokens = Object.entries( tokens ).reduce( ( agg: { lightTheme: { [ key: string ]: RGBAValue }, darkTheme: { [ key: string ]: RGBAValue } }, [ key, value ] ) => {
     agg.lightTheme[ key ] = convertValueToRGBA( lightTheme[ value as string ] );
@@ -96,21 +97,6 @@ function getColorTokens( themeColors: themeColorType, coreDirPath: string ) {
   }, { lightTheme: {}, darkTheme: {} } );
 
   return color_tokens;
-}
-
-function getAccentTokenColors( coreDirPath: string ) {
-  const processLine = ( line: string, agg: { [ key: string ]: string } ) => {
-    if ( line.startsWith( '$' ) ) {
-      let [ token, value ] = line.split( ':' ).map( ( t ) => t.trim().replace( ';', '' ) );
-      agg[ token ] = trimVar( value );
-    }
-    return agg;
-  };
-
-  const breakCondition = ( line: string ) => line.trim().startsWith( '$accent-color-map' );
-
-  const tokens = processScssFile( path.join( getScssTokensDirPath( coreDirPath ), '_accent-color.scss' ), processLine, breakCondition );
-  return tokens;
 }
 
 function getOverlayTokens( coreDirPath: string ) {
@@ -122,9 +108,7 @@ function getOverlayTokens( coreDirPath: string ) {
     return agg;
   };
 
-  const breakCondition = ( line: string ) => line.trim().startsWith( '$color-map' );
-
-  const tokens = processScssFile( path.join( getScssTokensDirPath( coreDirPath ), '_overlay-color.scss' ), processLine, breakCondition );
+  const tokens = processScssFile( path.join( getScssTokensDirPath( coreDirPath ), '_overlay-color.scss' ), processLine );
   return tokens;
 }
 
@@ -145,9 +129,11 @@ function getChartTokens( coreDirPath: string ) {
 export function parseTokens( coreDirPath: string ) {
   const { spacingTokens } = getRadiusAndSpacingTokens( coreDirPath );
   const themeColors = getThemeBasedColors( coreDirPath );
-  const colorTokens = getColorTokens( themeColors, coreDirPath );
+  const colorTokens = getColorTokens('_color.scss', themeColors, coreDirPath );
+  const accentColors = getColorTokens('_accent-color.scss',  themeColors, coreDirPath );
   return {
     SPACING_TOKENS: spacingTokens,
-    COLOR_TOKENS:colorTokens
+    COLOR_TOKENS: colorTokens,
+    ACCENT_TOKENS: accentColors,
   };
 }

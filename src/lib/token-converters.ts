@@ -1,19 +1,22 @@
-import * as appConfig from './config';
+import * as config from './config';
 import { convertValueToRGBA, RGBAValue } from './utils';
+
+type colorTokenType = {
+  lightTheme: { [ key: string ]: RGBAValue },
+  darkTheme: { [ key: string ]: RGBAValue }
+};
 
 let BASE_REM_VALUE = 16;
 let SPACING_TOKENS: { [ key: string ]: string } = {};
 let SPACING_BREAKPOINTS: number[] = [];
-let COLOR_TOKENS: {
-  lightTheme: { [ key: string ]: RGBAValue },
-  darkTheme: { [ key: string ]: RGBAValue }
-} = { lightTheme: {}, darkTheme: {} };
+let COLOR_TOKENS: colorTokenType = { lightTheme: {}, darkTheme: {} };
+let ACCENT_TOKENS: colorTokenType = { lightTheme: {}, darkTheme: {} };
 
-appConfig.appConfig.subscribe( ( values ) => {
+config.appConfig.subscribe( ( values ) => {
   if ( values.IS_TOKEN_CONFIG_LOADED ) {
-    const spacingTokens = values[ appConfig.APP_CONFIG_KEYS.SPACING_TOKENS ];
-    COLOR_TOKENS = values[ appConfig.APP_CONFIG_KEYS.COLOR_TOKENS ] ?? { lightTheme: {}, darkTheme: {} };
-
+    const spacingTokens = values[ config.APP_CONFIG_KEYS.SPACING_TOKENS ];
+    COLOR_TOKENS = values[ config.APP_CONFIG_KEYS.COLOR_TOKENS ] ?? { lightTheme: {}, darkTheme: {} };
+    ACCENT_TOKENS = values[ config.APP_CONFIG_KEYS.ACCENT_TOKENS ] ?? { lightTheme: {}, darkTheme: {} };
     Object.entries( spacingTokens ).forEach( ( [ token, unitPxValue ] ) => {
       const nonPxVal = ( unitPxValue as string ).replace( 'px', '' );
       SPACING_TOKENS[ nonPxVal ] = token;
@@ -45,7 +48,7 @@ export function convertToSpacingToken( value: string ) {
   if ( value.includes( '$' ) || value.includes( 'rem-calc' ) || /[1-9]em$/gi.test( value ) || value.endsWith( 'px' ) ) {
     return value;
   }
-  const nonExactToRemCalc = appConfig.appConfig.value[ appConfig.APP_CONFIG_KEYS.NON_EXACT_TOKEN_TO_REM_CALC ];
+  const nonExactToRemCalc = config.appConfig.value[ config.APP_CONFIG_KEYS.NON_EXACT_TOKEN_TO_REM_CALC ];
   value = value.trim().replace( ';', '' );
   const [ unit ] = value.match( /[^0-9]+$/ ) ?? [];
   const [ numericValue ] = value.match( /^-?\d+(\.\d+)?/ ) ?? [];
@@ -174,9 +177,9 @@ function findNearestColor( colorToFind: RGBAValue, allColorTokens: { [ key: stri
 }
 
 export function getNearestColorTokens( colorValue: string, mode = 'light' ) {
-  const allLightTheme = { ...COLOR_TOKENS.lightTheme };
-  const allDarkTheme = { ...COLOR_TOKENS.darkTheme };
-  const tokens = mode === 'light' ? allLightTheme : allDarkTheme;
+  const lightTheme = { ...COLOR_TOKENS.lightTheme, ...ACCENT_TOKENS.lightTheme };
+  const darkTheme = { ...COLOR_TOKENS.darkTheme, ...ACCENT_TOKENS.darkTheme };
+  const tokens = mode === 'light' ? lightTheme : darkTheme;
 
   try {
     if ( colorValue.startsWith( '$' ) ) {
@@ -187,7 +190,6 @@ export function getNearestColorTokens( colorValue: string, mode = 'light' ) {
         rgba: value?.rgba,
         original: value?.original
       } ) );
-
     }
 
     const rgba = convertValueToRGBA( colorValue );

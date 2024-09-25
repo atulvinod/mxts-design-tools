@@ -61,3 +61,33 @@ export function convertValueToRGBA( value: string ): RGBAValue {
 
   return null;
 }
+
+/**
+ * Checks if a particular line is eligible for parsing into a token
+ * This function checks if a value is inside a map or a function and skips those lines as
+ * the values inside them as they might not be a token value;
+ */
+export function lineParseValidator() {
+  let bracketStack = [];
+
+  const bracketPairs = {
+    '}': '{',
+    ')': '(',
+    ']': '['
+  };
+
+  return ( line: string ) => {
+    const bracketsInLine = line.match( /[\[\](){}]/g ) ?? [];
+    for ( const b of bracketsInLine ) {
+      if ( Object.values( bracketPairs ).indexOf( b ) !== - 1 ) {
+        bracketStack.push( b );
+      } else {
+        const isCompleteBracket = bracketPairs[ b as keyof typeof bracketPairs ] === bracketStack[ bracketStack.length - 1 ];
+        if ( isCompleteBracket ) {
+          bracketStack.pop();
+        }
+      }
+    }
+    return Boolean( bracketStack.length );
+  };
+}
