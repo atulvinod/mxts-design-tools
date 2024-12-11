@@ -1,11 +1,13 @@
 import * as path from 'path';
 import * as fs from 'fs';
 
-import { trimRemCalc, trimVar, getTokenAndValue, convertValueToRGBA, RGBAValue, lineParseValidator } from './utils';
+import { trimRemCalc, trimVar, getTokenAndValue, convertValueToRGBA, RGBAValue, bracketContentSkipper } from './utils';
 
 export const getDesignTokenDirPath = ( coreDirPath: string ) => path.join( coreDirPath, 'lib', 'design-tokens', 'src' );
 
 export const getScssTokensDirPath = ( coreDirPath: string ) => path.join( getDesignTokenDirPath( coreDirPath ), 'scss-tokens' );
+
+export const getTokensDirPath = ( coreDirPath: string ) => path.join( getDesignTokenDirPath( coreDirPath ), 'tokens' )
 
 type themeColorType = { lightTheme: { [ key: string ]: string }, darkTheme: { [ key: string ]: string } };
 
@@ -34,9 +36,9 @@ function getRootColors( rootColorFilePath: string ) {
   return colors;
 }
 
-function processScssFile( filePath: string, processLineCallback: ( a0: string, a1: { [ key: string ]: string } ) => { [ key: string ]: string }, disableSkippingWithinBracketContent: boolean = false ) {
-  let agg: { [ key: string ]: string } = {};
-  const checkInvalidLine = lineParseValidator();
+function processScssFile<T>( filePath: string, processLineCallback: ( a0: string, a1: { [ key: string ]: T } ) => { [ key: string ]: T }, disableSkippingWithinBracketContent: boolean = false ) {
+  let agg: { [ key: string ]: T } = {};
+  const checkInvalidLine = bracketContentSkipper();
   const file = fs.readFileSync( filePath, 'utf8' );
   const fileLines = file.split( '\n' );
   for ( let line of fileLines ) {
@@ -77,7 +79,7 @@ function getRadiusAndSpacingTokens( coreDirPath: string ) {
   return { radiusTokens, spacingTokens };
 }
 
-function getColorTokens(fileName: string, themeColors: themeColorType, coreDirPath: string ) {
+function getColorTokens( fileName: string, themeColors: themeColorType, coreDirPath: string ) {
   const { lightTheme, darkTheme } = themeColors;
 
   const processColorTokenLine = ( line: string, agg: { [ key: string ]: string } ) => {
@@ -125,15 +127,42 @@ function getChartTokens( coreDirPath: string ) {
   return tokens;
 }
 
+function getMixinTokens( coreDirPath: string, fileName: string ) {
+  const validateNotBracketContent = bracketContentSkipper();
+  const processLine = ( line: string, agg: { [ key: string ]: Array<string> } ) => {
+    if ( !Array.isArray( agg[ 'tokens' ] ) ) {
+      agg[ 'tokens' ] = [];
+    }
+    if ( validateNotBracketContent( line ) ) {
+      if ( line.startsWith( '@mixin' ) ) {
+        const mixinName = line.replace( '@mixin', '' ).replace( '{', '' ).replace( /\([^()]*\)/, '' ).trim();
+        if ( !mixinName.endsWith( 'classes' ) && !mixinName.startsWith( '-' ) ) {
+          agg[ 'tokens' ].push( mixinName );
+        }
+      }
+    }
+    return agg;
+  };
+
+  const mixinTokens = processScssFile( path.join( getTokensDirPath( coreDirPath ), fileName ), processLine, true );
+  return mixinTokens[ 'tokens' ];
+}
 
 export function parseTokens( coreDirPath: string ) {
-  const { spacingTokens } = getRadiusAndSpacingTokens( coreDirPath );
+  const { spacingTokens, radiusTokens } = getRadiusAndSpacingTokens( coreDirPath );
   const themeColors = getThemeBasedColors( coreDirPath );
-  const colorTokens = getColorTokens('_color.scss', themeColors, coreDirPath );
-  const accentColors = getColorTokens('_accent-color.scss',  themeColors, coreDirPath );
+  const colorTokens = getColorTokens( '_color.scss', themeColors, coreDirPath );
+  const accentColors = getColorTokens( '_accent-color.scss', themeColors, coreDirPath );
+  const elevationTokens = getMixinTokens( coreDirPath, "_elevation.scss" );
+  const typographyTokens = getMixinTokens( coreDirPath, '_typography.scss' );
+  const buttonStyles = getMixinTokens( coreDirPath, '_button-styles.scss' );
   return {
     SPACING_TOKENS: spacingTokens,
     COLOR_TOKENS: colorTokens,
     ACCENT_TOKENS: accentColors,
+    ELEVATION_TOKENS: elevationTokens,
+    TYPOGRAPHY_TOKENS: typographyTokens,
+    BUTTON_STYLES: buttonStyles,
+    RADIUS_TOKENS: radiusTokens,
   };
 }

@@ -65,6 +65,13 @@
           "icon": "media/pen-drawing-icon.svg",
           "contextualTitle": "Tool to find the color token",
           "type": "webview"
+        },
+        {
+          "id": "elevation-typography-buttonstyles",
+          "name": "Elevation/Typography/Button Styles",
+          "icon": "media/pen-drawing-icon.svg",
+          "contextualTitle": "Tool to lookup elevation, typography and button style tokens",
+          "type": "webview"
         }
       ]
     },

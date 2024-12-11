@@ -1,0 +1,27 @@
+.tokens-section {
+  margin-top: 1rem;
+}
+
+h4 {
+  margin-block: 0;
+}
+
+hr {
+  margin-top: 0;
+}
+
+.token-name {
+  font-family: monospace;
+  color: orange;
+  flex: 1;
+}
+
+.result-row {
+  background-color: var(--vscode-input-background);
+  display: flex;
+  margin-top: 2px;
+  align-items: center;
+  padding-inline: 3px;
+  padding-block: 1.5px;
+  cursor: pointer;
+}

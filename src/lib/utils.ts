@@ -67,10 +67,10 @@ export function convertValueToRGBA( value: string ): RGBAValue {
  * This function checks if a value is inside a map or a function and skips those lines as
  * the values inside them as they might not be a token value;
  */
-export function lineParseValidator() {
+export function bracketContentSkipper() {
   let bracketStack = [];
 
-  const bracketPairs = {
+  const bracketPairs: { [ key: string ]: string } = {
     '}': '{',
     ')': '(',
     ']': '['
@@ -79,11 +79,11 @@ export function lineParseValidator() {
   return ( line: string ) => {
     const bracketsInLine = line.match( /[\[\](){}]/g ) ?? [];
     for ( const b of bracketsInLine ) {
-      if ( Object.values( bracketPairs ).indexOf( b ) !== - 1 ) {
+      if ( Object.values( bracketPairs ).indexOf( b ) != - 1 ) {
         bracketStack.push( b );
       } else {
-        const isCompleteBracket = bracketPairs[ b as keyof typeof bracketPairs ] === bracketStack[ bracketStack.length - 1 ];
-        if ( isCompleteBracket ) {
+        const isOpenBracket = bracketPairs[ b ] == bracketStack[ bracketStack.length - 1 ];
+        if ( isOpenBracket ) {
           bracketStack.pop();
         }
       }
