@@ -27,7 +27,7 @@
             agg.ELEVATION.push( value );
           } else if ( value.type === 'typography' ) {
             agg.TYPOGRAPHY.push( value );
-          } else if ( value.type == 'button_style' ) {
+          } else if ( value.type === 'button_style' ) {
             agg.BUTTON_STYLE.push( value );
           } else {
             agg.RADIUS.push( value );
@@ -83,7 +83,7 @@
 
         Array.from( $( '.result-row' ) ).forEach( row => {
           $( row ).on( 'click', () => {
-            if ( row.dataset.type == 'nonevalue' ) {
+            if ( row.dataset.type === 'no-value' ) {
               postMessageToVS( 'COPY_TO_CLIPBOARD', `@include tokens.${ row.dataset.token }` );
             } else {
               postMessageToVS( 'COPY_TO_CLIPBOARD', `tokens.${ row.dataset.token }` );
@@ -106,7 +106,7 @@
   function getResultRow ( args ) {
     if ( !args.value ) {
       return `
-      <div class='result-row' data-type='nonvalue'  data-token=${ args.name } title='Click to copy'>
+      <div class='result-row' data-type='no-value'  data-token=${ args.name } title='Click to copy'>
         <span class='token-name'>${ args.name }</span>
       </div>
       `;
