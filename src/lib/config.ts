@@ -28,7 +28,8 @@ export const APP_CONFIG_KEYS = {
   'ACCENT_TOKENS': 'ACCENT_TOKENS',
   'ELEVATION_TOKENS': 'ELEVATION_TOKENS',
   'TYPOGRAPHY_TOKENS': 'TYPOGRAPHY_TOKENS',
-  'BUTTON_STYLE_TOKENS': 'BUTTON_STYLE_TOKENS'
+  'BUTTON_STYLE_TOKENS': 'BUTTON_STYLE_TOKENS',
+  'RADIUS_TOKENS': 'RADIUS_TOKENS'
 };
 
 const CONFIG: AppConfigType = {
@@ -69,13 +70,14 @@ export function setAppConfig( forceUpdate: boolean = false ) {
       saveTokenDataToConfig( parsedTokenData );
       tokenData = parsedTokenData;
     }
-    
+
     updateAppConfig( APP_CONFIG_KEYS.SPACING_TOKENS, tokenData[ APP_CONFIG_KEYS.SPACING_TOKENS ] );
     updateAppConfig( APP_CONFIG_KEYS.COLOR_TOKENS, tokenData[ APP_CONFIG_KEYS.COLOR_TOKENS ] );
     updateAppConfig( APP_CONFIG_KEYS.ACCENT_TOKENS, tokenData[ APP_CONFIG_KEYS.ACCENT_TOKENS ] );
     updateAppConfig( APP_CONFIG_KEYS.ELEVATION_TOKENS, tokenData[ APP_CONFIG_KEYS.ELEVATION_TOKENS ] );
     updateAppConfig( APP_CONFIG_KEYS.BUTTON_STYLE_TOKENS, tokenData[ APP_CONFIG_KEYS.BUTTON_STYLE_TOKENS ] );
     updateAppConfig( APP_CONFIG_KEYS.TYPOGRAPHY_TOKENS, tokenData[ APP_CONFIG_KEYS.TYPOGRAPHY_TOKENS ] );
+    updateAppConfig( APP_CONFIG_KEYS.RADIUS_TOKENS, tokenData[ APP_CONFIG_KEYS.RADIUS_TOKENS ] );
     updateAppConfig( APP_CONFIG_KEYS.IS_TOKEN_CONFIG_LOADED, true );
   }
 }

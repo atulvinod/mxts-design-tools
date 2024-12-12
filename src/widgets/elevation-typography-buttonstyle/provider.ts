@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { getNonce } from '../../utils';
 import { appConfig } from '../../lib/config';
 import { getUnConfiguredContent } from '../shared/shared-webviews';
-import { getSubtleEffectTokens } from '../../lib/token-converters';
+import { findTokens } from '../../lib/token-converters';
 
 
 function getMainWebViewContent( webview: vscode.Webview, extensionUri: vscode.Uri ) {
@@ -28,22 +28,37 @@ function getMainWebViewContent( webview: vscode.Webview, extensionUri: vscode.Ur
               <input type='text' placeholder='Search for a token' id='token-search'> 
 
               <section class='tokens-section'>
-                <h4>Elevation</h4>
-                <hr>
+                <div id='radius-heading'>
+                  <h4>Radius tokens</h4>
+                  <hr>
+                </div>
+                <div id='radius-section'>
+                </div>
+              </section>
+
+              <section class='tokens-section'>
+                <div id='elevation-heading'>
+                  <h4>Elevation</h4>
+                  <hr>
+                </div>
                 <div id='elevation-section'>
                 </div>
               </section>
 
               <section class='tokens-section'>
-                <h4>Typography</h4>
-                <hr>
+                <div id='typography-heading'>
+                  <h4>Typography</h4>
+                  <hr>
+                </div>
                 <div id='typography-section'>
                 </div>
               </section>
 
               <section class='tokens-section'>
-                <h4>Button Styles</h4>
-                <h4>
+                <div id='button-heading'>
+                  <h4>Button Styles</h4>
+                  <hr>
+                </div>
                 <div id='button-section'>
                 </div>
               </section>
@@ -76,11 +91,14 @@ export class ElevationTypographyButtonStyleProvider implements vscode.WebviewVie
     webviewView.webview.onDidReceiveMessage( message => {
       switch ( message.command ) {
         case 'GET_RESULT': {
-          const result = getSubtleEffectTokens( message.args );
+          const result = findTokens( message.args );
           webviewView.webview.postMessage( {
             args: result,
             command: 'SET_RESULT',
           } );
+        }
+        case 'COPY_TO_CLIPBOARD': {
+          vscode.env.clipboard.writeText( message.args );
         }
       }
     } );

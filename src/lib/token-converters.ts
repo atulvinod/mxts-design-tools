@@ -6,9 +6,10 @@ type colorTokenType = {
   darkTheme: { [ key: string ]: RGBAValue }
 };
 
-type subtleEffectTokenType = {
+type tokenType = {
   name: string,
-  type: string
+  type: string,
+  value?: string,
 }
 
 let BASE_REM_VALUE = 16;
@@ -16,9 +17,10 @@ let SPACING_TOKENS: { [ key: string ]: string } = {};
 let SPACING_BREAKPOINTS: number[] = [];
 let COLOR_TOKENS: colorTokenType = { lightTheme: {}, darkTheme: {} };
 let ACCENT_TOKENS: colorTokenType = { lightTheme: {}, darkTheme: {} };
-let ELEVATION_TOKENS: subtleEffectTokenType[] = [];
-let TYPOGRAPHY_TOKENS: subtleEffectTokenType[] = [];
-let BUTTON_STYLE_TOKENS: subtleEffectTokenType[] = [];
+let ELEVATION_TOKENS: tokenType[] = [];
+let TYPOGRAPHY_TOKENS: tokenType[] = [];
+let BUTTON_STYLE_TOKENS: tokenType[] = [];
+let RADIUS_TOKENS: tokenType[] = [];
 
 config.appConfig.subscribe( ( values ) => {
   if ( values.IS_TOKEN_CONFIG_LOADED ) {
@@ -37,6 +39,14 @@ config.appConfig.subscribe( ( values ) => {
     TYPOGRAPHY_TOKENS = ( values[ config.APP_CONFIG_KEYS.TYPOGRAPHY_TOKENS ] ?? [] ).map( ( name: string ) => ( { name, type: 'typography' } ) );;
 
     BUTTON_STYLE_TOKENS = ( values[ config.APP_CONFIG_KEYS.BUTTON_STYLE_TOKENS ] ?? [] ).map( ( name: string ) => ( { name, type: 'button_style' } ) );;
+
+    RADIUS_TOKENS = Object.entries( values[ config.APP_CONFIG_KEYS.RADIUS_TOKENS ] ?? {} ).map( ( [ key, value ] ) => {
+      return {
+        name: key,
+        value: value,
+        type: 'radius-tokens'
+      };
+    } ) as { name: string, value: string, type: string }[];
   }
   BASE_REM_VALUE = Number( values.BASE_REM_VALUE );
 } );
@@ -214,8 +224,9 @@ export function getNearestColorTokens( colorValue: string, mode = 'light' ) {
   }
 }
 
-export function getSubtleEffectTokens( searchString: string ) {
-  const searchSpace = [ ...ELEVATION_TOKENS, ...BUTTON_STYLE_TOKENS, ...TYPOGRAPHY_TOKENS ];
+export function findTokens( searchString: string ) {
+  const searchSpace = [ ...ELEVATION_TOKENS, ...BUTTON_STYLE_TOKENS, ...TYPOGRAPHY_TOKENS, ...RADIUS_TOKENS ];
+
   if ( !searchString || !searchString.length ) {
     return searchSpace;
   }

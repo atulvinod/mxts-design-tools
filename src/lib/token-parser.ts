@@ -2,6 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 import { trimRemCalc, trimVar, getTokenAndValue, convertValueToRGBA, RGBAValue, bracketContentSkipper } from './utils';
+import { APP_CONFIG_KEYS } from './config';
 
 export const getDesignTokenDirPath = ( coreDirPath: string ) => path.join( coreDirPath, 'lib', 'design-tokens', 'src' );
 
@@ -157,12 +158,12 @@ export function parseTokens( coreDirPath: string ) {
   const typographyTokens = getMixinTokens( coreDirPath, '_typography.scss' );
   const buttonStyles = getMixinTokens( coreDirPath, '_button-styles.scss' );
   return {
-    SPACING_TOKENS: spacingTokens,
-    COLOR_TOKENS: colorTokens,
-    ACCENT_TOKENS: accentColors,
-    ELEVATION_TOKENS: elevationTokens,
-    TYPOGRAPHY_TOKENS: typographyTokens,
-    BUTTON_STYLES: buttonStyles,
-    RADIUS_TOKENS: radiusTokens,
+    [ APP_CONFIG_KEYS.SPACING_TOKENS ]: spacingTokens,
+    [ APP_CONFIG_KEYS.COLOR_TOKENS ]: colorTokens,
+    [ APP_CONFIG_KEYS.ACCENT_TOKENS ]: accentColors,
+    [ APP_CONFIG_KEYS.ELEVATION_TOKENS ]: elevationTokens,
+    [ APP_CONFIG_KEYS.TYPOGRAPHY_TOKENS ]: typographyTokens,
+    [ APP_CONFIG_KEYS.BUTTON_STYLE_TOKENS ]: buttonStyles,
+    [ APP_CONFIG_KEYS.RADIUS_TOKENS ]: radiusTokens,
   };
 }
