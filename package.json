@@ -104,7 +104,7 @@
     "check-types": "tsc --noEmit",
     "lint": "eslint src --ext ts",
     "test": "vscode-test",
-    "vsix": "vsce package"
+    "vsix": "vsce package --allow-missing-repository"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.7",
