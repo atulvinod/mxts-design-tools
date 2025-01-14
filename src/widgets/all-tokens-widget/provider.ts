@@ -7,11 +7,11 @@ import { findTokens } from '../../lib/token-converters';
 
 function getMainWebViewContent( webview: vscode.Webview, extensionUri: vscode.Uri ) {
   const mainStyleUri = webview.asWebviewUri( vscode.Uri.joinPath( extensionUri, 'media', 'main.css' ) );
-  const scriptUri = webview.asWebviewUri( vscode.Uri.joinPath( extensionUri, 'src', 'widgets', 'elevation-typography-buttonstyle', 'webview-script.js' ) );
+  const scriptUri = webview.asWebviewUri( vscode.Uri.joinPath( extensionUri, 'src', 'widgets', 'all-tokens-widget', 'webview-script.js' ) );
   // Use CSP to allow loading of resources
   const nonce = getNonce();
   const jquery = webview.asWebviewUri( vscode.Uri.joinPath( extensionUri, 'deps', 'jquery.js' ) );
-  const styles = webview.asWebviewUri( vscode.Uri.joinPath( extensionUri, 'src', 'widgets', 'elevation-typography-buttonstyle', 'styles.css' ) );
+  const styles = webview.asWebviewUri( vscode.Uri.joinPath( extensionUri, 'src', 'widgets', 'all-tokens-widget', 'styles.css' ) );
 
   return `<!DOCTYPE html>
             <html lang="en">
@@ -26,6 +26,15 @@ function getMainWebViewContent( webview: vscode.Webview, extensionUri: vscode.Ur
             </head>
             <body>
               <input type='text' placeholder='Search for a token' id='token-search'> 
+
+              <section class='tokens-section'>
+                <div id='spacing-heading'>
+                  <h4>Spacing tokens</h4>
+                  <hr>
+                </div>
+                <div id='spacing-section'>
+                </div>
+              </section>
 
               <section class='tokens-section'>
                 <div id='radius-heading'>
@@ -67,9 +76,9 @@ function getMainWebViewContent( webview: vscode.Webview, extensionUri: vscode.Ur
           </html>`;
 }
 
-export class ElevationTypographyButtonStyleProvider implements vscode.WebviewViewProvider {
+export class AllTokensProvider implements vscode.WebviewViewProvider {
 
-  public static readonly PROVIDER_ID = 'elevation-typography-buttonstyles';
+  public static readonly PROVIDER_ID = 'all-tokens';
 
   constructor( private extensionUri: vscode.Uri ) { }
 

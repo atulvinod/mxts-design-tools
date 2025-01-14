@@ -4,6 +4,7 @@
   const typographySection = $( '#typography-section' );
   const buttonSection = $( '#button-section' );
   const radiusSection = $( '#radius-section' );
+  const spacingTokenSection = $( '#spacing-section' );
 
   const tokenSearchbar = $( '#token-search' );
 
@@ -11,6 +12,7 @@
   const typographyHeading = $( '#typography-heading' );
   const buttonHeading = $( '#button-heading' );
   const radiusHeading = $( '#radius-heading' );
+  const spacingTokenHeading = $( '#spacing-heading' );
 
   tokenSearchbar.on( 'input', event => {
     const { value } = event.target;
@@ -22,13 +24,15 @@
 
     switch ( command ) {
       case "SET_RESULT": {
-        const { ELEVATION, TYPOGRAPHY, BUTTON_STYLE, RADIUS } = args.reduce( ( agg, value ) => {
+        const { ELEVATION, TYPOGRAPHY, BUTTON_STYLE, RADIUS, SPACING } = args.reduce( ( agg, value ) => {
           if ( value.type === 'elevation' ) {
             agg.ELEVATION.push( value );
           } else if ( value.type === 'typography' ) {
             agg.TYPOGRAPHY.push( value );
           } else if ( value.type === 'button_style' ) {
             agg.BUTTON_STYLE.push( value );
+          } else if ( value.type === 'spacing_tokens' ) {
+            agg.SPACING.push( value );
           } else {
             agg.RADIUS.push( value );
           }
@@ -37,7 +41,8 @@
           ELEVATION: [],
           TYPOGRAPHY: [],
           BUTTON_STYLE: [],
-          RADIUS: []
+          RADIUS: [],
+          SPACING: []
         } );
 
         elevationSection.empty();
@@ -79,6 +84,16 @@
           radiusHeading.show();
         } else {
           radiusHeading.hide();
+        }
+
+        spacingTokenSection.empty();
+        SPACING.forEach( arg => {
+          spacingTokenSection.append( getResultRow( arg ) );
+        } );
+        if ( SPACING.length ) {
+          spacingTokenHeading.show();
+        } else {
+          spacingTokenHeading.hide();
         }
 
         Array.from( $( '.result-row' ) ).forEach( row => {

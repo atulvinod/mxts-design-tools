@@ -67,7 +67,7 @@
           "type": "webview"
         },
         {
-          "id": "elevation-typography-buttonstyles",
+          "id": "all-tokens",
           "name": "tokens",
           "icon": "media/pen-drawing-icon.svg",
           "contextualTitle": "Tool to lookup elevation, typography,radius and button style tokens",

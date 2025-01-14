@@ -8,7 +8,7 @@ export const getDesignTokenDirPath = ( coreDirPath: string ) => path.join( coreD
 
 export const getScssTokensDirPath = ( coreDirPath: string ) => path.join( getDesignTokenDirPath( coreDirPath ), 'scss-tokens' );
 
-export const getTokensDirPath = ( coreDirPath: string ) => path.join( getDesignTokenDirPath( coreDirPath ), 'tokens' )
+export const getTokensDirPath = ( coreDirPath: string ) => path.join( getDesignTokenDirPath( coreDirPath ), 'tokens' );
 
 type themeColorType = { lightTheme: { [ key: string ]: string }, darkTheme: { [ key: string ]: string } };
 

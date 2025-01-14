@@ -10,17 +10,20 @@ type tokenType = {
   name: string,
   type: string,
   value?: string,
-}
+};
 
 let BASE_REM_VALUE = 16;
-let SPACING_TOKENS: { [ key: string ]: string } = {};
+let SPACING_TOKEN_MAP: { [ key: string ]: string } = {};
 let SPACING_BREAKPOINTS: number[] = [];
 let COLOR_TOKENS: colorTokenType = { lightTheme: {}, darkTheme: {} };
 let ACCENT_TOKENS: colorTokenType = { lightTheme: {}, darkTheme: {} };
+
 let ELEVATION_TOKENS: tokenType[] = [];
 let TYPOGRAPHY_TOKENS: tokenType[] = [];
 let BUTTON_STYLE_TOKENS: tokenType[] = [];
 let RADIUS_TOKENS: tokenType[] = [];
+let SPACING_TOKENS: tokenType[] = [];
+
 
 config.appConfig.subscribe( ( values ) => {
   if ( values.IS_TOKEN_CONFIG_LOADED ) {
@@ -29,10 +32,10 @@ config.appConfig.subscribe( ( values ) => {
     ACCENT_TOKENS = values[ config.APP_CONFIG_KEYS.ACCENT_TOKENS ] ?? { lightTheme: {}, darkTheme: {} };
     Object.entries( spacingTokens ).forEach( ( [ token, unitPxValue ] ) => {
       const nonPxVal = ( unitPxValue as string ).replace( 'px', '' );
-      SPACING_TOKENS[ nonPxVal ] = token;
+      SPACING_TOKEN_MAP[ nonPxVal ] = token;
     } );
 
-    SPACING_BREAKPOINTS = Object.keys( SPACING_TOKENS ).sort( ( a, b ) => Number( a ) - Number( b ) ).map( Number );
+    SPACING_BREAKPOINTS = Object.keys( SPACING_TOKEN_MAP ).sort( ( a, b ) => Number( a ) - Number( b ) ).map( Number );
 
     ELEVATION_TOKENS = ( values[ config.APP_CONFIG_KEYS.ELEVATION_TOKENS ] ?? [] ).map( ( name: string ) => ( { name, type: 'elevation' } ) );
 
@@ -47,6 +50,14 @@ config.appConfig.subscribe( ( values ) => {
         type: 'radius-tokens'
       };
     } ) as { name: string, value: string, type: string }[];
+
+    SPACING_TOKENS = Object.entries( values[ config.APP_CONFIG_KEYS.SPACING_TOKENS ] ).map( ( [ name, value ] ) => {
+      return {
+        name,
+        value: (value as string),
+        type: 'spacing_tokens'
+      };
+    } );
   }
   BASE_REM_VALUE = Number( values.BASE_REM_VALUE );
 } );
@@ -96,7 +107,7 @@ export function convertToSpacingToken( value: string ) {
 
   for ( let i = 0; i < SPACING_BREAKPOINTS.length; i++ ) {
     const currentBreakpoint = SPACING_BREAKPOINTS[ i ] as number;
-    const currentToken = SPACING_TOKENS[ currentBreakpoint ];
+    const currentToken = SPACING_TOKEN_MAP[ currentBreakpoint ];
 
     if ( i === 0 ) {
       // px value is lower than the lowest breakpoint
@@ -137,17 +148,17 @@ export function convertToSpacingToken( value: string ) {
         const upperBoundDiff = Math.abs( upperBound - pxValue );
 
         if ( lowerBoundDiff === 0 ) {
-          result = getSpacingToken( isNegative, SPACING_TOKENS[ lowerBound ] );
+          result = getSpacingToken( isNegative, SPACING_TOKEN_MAP[ lowerBound ] );
         } else if ( upperBoundDiff === 0 ) {
-          result = getSpacingToken( isNegative, SPACING_TOKENS[ upperBound ] );
+          result = getSpacingToken( isNegative, SPACING_TOKEN_MAP[ upperBound ] );
         } else {
           if ( lowerBoundDiff < upperBoundDiff ) {
             const multiplier = ( pxValue / lowerBound ).toPrecision( 3 );
-            result = getSpacingToken( isNegative, SPACING_TOKENS[ lowerBound ], multiplier );
+            result = getSpacingToken( isNegative, SPACING_TOKEN_MAP[ lowerBound ], multiplier );
 
           } else {
             const multiplier = ( pxValue / upperBound ).toPrecision( 3 );
-            result = getSpacingToken( isNegative, SPACING_TOKENS[ upperBound ], multiplier );
+            result = getSpacingToken( isNegative, SPACING_TOKEN_MAP[ upperBound ], multiplier );
           }
           if ( nonExactToRemCalc ) {
             result = getRemCalcValue( pxValue );
@@ -225,7 +236,7 @@ export function getNearestColorTokens( colorValue: string, mode = 'light' ) {
 }
 
 export function findTokens( searchString: string ) {
-  const searchSpace = [ ...ELEVATION_TOKENS, ...BUTTON_STYLE_TOKENS, ...TYPOGRAPHY_TOKENS, ...RADIUS_TOKENS ];
+  const searchSpace = [ ...ELEVATION_TOKENS, ...BUTTON_STYLE_TOKENS, ...TYPOGRAPHY_TOKENS, ...RADIUS_TOKENS, ...SPACING_TOKENS ];
 
   if ( !searchString || !searchString.length ) {
     return searchSpace;

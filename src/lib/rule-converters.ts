@@ -15,7 +15,7 @@ const SPACING_RULES = [
 
 export function getRuleConverter ( rule: string ) {
   if ( SPACING_RULES.includes( rule.trim() ) ) {
-    return valueConverters.convertMarginAndPadding;
+    return valueConverters.convertMarginAndPadding(rule.trim());
   }
   return null;
 }

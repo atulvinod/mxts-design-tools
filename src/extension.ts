@@ -5,14 +5,14 @@ import { ValueToSpacingTokenProvider } from './widgets/value-to-spacing-token-wi
 import { ConfigProvider } from './widgets/config-widget/config-provider';
 import * as  appConfig from './lib/config';
 import { ColorTokenFinderProvider } from './widgets/color-finder-widget/color-finder-provider';
-import { ElevationTypographyButtonStyleProvider } from './widgets/elevation-typography-buttonstyle/provider';
+import { AllTokensProvider } from './widgets/all-tokens-widget/provider';
 
 const WIDGET_PROVIDERS: { [ provider: string ]: ( uri: vscode.Uri ) => vscode.WebviewViewProvider } =
 {
 	[ ValueToSpacingTokenProvider.PROVIDER_ID ]: ( extensionUri: vscode.Uri ) => new ValueToSpacingTokenProvider( extensionUri ),
 	[ ConfigProvider.PROVIDER_ID ]: ( extensionUri: vscode.Uri ) => new ConfigProvider( extensionUri ),
 	[ ColorTokenFinderProvider.PROVIDER_ID ]: ( extensionUri: vscode.Uri ) => new ColorTokenFinderProvider( extensionUri ),
-	[ ElevationTypographyButtonStyleProvider.PROVIDER_ID ]: ( uri: vscode.Uri ) => new ElevationTypographyButtonStyleProvider( uri )
+	[ AllTokensProvider.PROVIDER_ID ]: ( uri: vscode.Uri ) => new AllTokensProvider( uri )
 };
 
 
