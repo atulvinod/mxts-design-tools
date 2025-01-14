@@ -3,6 +3,7 @@ import { getNonce } from '../../utils';
 import * as valueConverters from '../../lib/value-converters';
 import { APP_CONFIG_KEYS, appConfig } from '../../lib/config';
 import { getUnConfiguredContent } from '../shared/shared-webviews';
+import { tokenType } from '../../lib/token-converters';
 
 function getMainWebViewContent( webview: vscode.Webview, extensionUri: vscode.Uri ) {
   const mainStyleUri = webview.asWebviewUri( vscode.Uri.joinPath( extensionUri, 'media', 'main.css' ) );
@@ -26,13 +27,20 @@ function getMainWebViewContent( webview: vscode.Webview, extensionUri: vscode.Ur
                 <input type="text" id="value-input" class="flex-1" name="value-input" placeholder='Enter a unit value...'/>
                 <button id='convert-button'>Convert</button>
               </div>
+              
               <textarea rows="5" class='w-95 convert-result-textarea no-resize' placeholder='Result' readonly id='convert-result-textarea'></textarea>
+              
               <div class='d-flex d-justify-space-between'>
                 <span class='info-subtext'>1REM = <span id="rem-value" '></span>px</span>
                 <span id='copy-tokens' class='secondary-button mr-8' title='Click to copy'>Copy</span>
               </div>
-              <div>
+
+              <div class='tokens-section'>
+                <hr>
+                <div id='spacing-tokens'>
+                <div>
               </div>
+
             </body>
             <script src="${ scriptUri }" nonce="${ nonce }"></script>
           </html>
@@ -90,6 +98,16 @@ export class ValueToSpacingTokenProvider implements vscode.WebviewViewProvider {
   postCommonMessagesToWebview( webviewView: vscode.WebviewView ) {
     webviewView.webview.postMessage( { command: "UPDATE_REM", args: appConfig.value.BASE_REM_VALUE } );
     webviewView.webview.postMessage( { command: "UPDATE_NON_EXACT_TOKEN_TO_REM", args: appConfig.value[ APP_CONFIG_KEYS.NON_EXACT_TOKEN_TO_REM_CALC ] } );
+
+    const tokens: tokenType[] = Object.entries( appConfig.value[ APP_CONFIG_KEYS.SPACING_TOKENS ] ?? {} ).map( ( [ name, value ] ) => {
+      return {
+        name,
+        value: ( value as string ),
+        type: 'spacing_tokens'
+      };
+    } );
+
+    webviewView.webview.postMessage( { command: 'UPDATE_TOKEN_SECTION', args: tokens } );
   }
 
 

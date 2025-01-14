@@ -127,3 +127,30 @@ textarea {
   font-weight: 600;
   cursor: pointer;
 }
+
+.tokens-section {
+  margin-top: 1rem;
+}
+
+.result-row {
+  background-color: var(--vscode-input-background);
+  display: flex;
+  margin-top: 2px;
+  align-items: center;
+  padding-inline: 3px;
+  padding-block: 1.5px;
+  cursor: pointer;
+  justify-content: space-between;
+}
+
+.token-name {
+  font-family: monospace;
+  color: orange;
+  flex: 1;
+}
+
+.token-name--noflex{
+  font-family: monospace;
+  color: orange;
+  flex: none;
+}

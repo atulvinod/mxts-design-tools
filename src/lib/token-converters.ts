@@ -1,12 +1,12 @@
 import * as config from './config';
 import { convertValueToRGBA, RGBAValue } from './utils';
 
-type colorTokenType = {
+export type colorTokenType = {
   lightTheme: { [ key: string ]: RGBAValue },
   darkTheme: { [ key: string ]: RGBAValue }
 };
 
-type tokenType = {
+export type tokenType = {
   name: string,
   type: string,
   value?: string,
