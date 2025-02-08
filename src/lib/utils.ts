@@ -1,5 +1,5 @@
 export function trimRemCalc( value: string ) {
-  return value.replace( 'rem-calc(', '' ).replace( ')', '' );
+  return value.replace( 'rem-calc(', '' ).replace( ')', '' ).replace( 'util.', '' );
 }
 
 export function trimVar( value: string ) {

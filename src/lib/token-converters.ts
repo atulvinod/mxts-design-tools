@@ -30,23 +30,24 @@ config.appConfig.subscribe( ( values ) => {
     const spacingTokens = values[ config.APP_CONFIG_KEYS.SPACING_TOKENS ];
     COLOR_TOKENS = values[ config.APP_CONFIG_KEYS.COLOR_TOKENS ] ?? { lightTheme: {}, darkTheme: {} };
     ACCENT_TOKENS = values[ config.APP_CONFIG_KEYS.ACCENT_TOKENS ] ?? { lightTheme: {}, darkTheme: {} };
+
     Object.entries( spacingTokens ).forEach( ( [ token, unitPxValue ] ) => {
-      const nonPxVal = ( unitPxValue as string ).replace( 'px', '' );
+      const nonPxVal = ( unitPxValue as string ).replace( 'util.', '' ).replace( 'px', '' ).trim();
       SPACING_TOKEN_MAP[ nonPxVal ] = token;
     } );
 
     SPACING_BREAKPOINTS = Object.keys( SPACING_TOKEN_MAP ).sort( ( a, b ) => Number( a ) - Number( b ) ).map( Number );
 
-    ELEVATION_TOKENS = ( values[ config.APP_CONFIG_KEYS.ELEVATION_TOKENS ] ?? [] ).map( ( name: string ) => ( { name, type: 'elevation' } ) );
+    ELEVATION_TOKENS = ( values[ config.APP_CONFIG_KEYS.ELEVATION_TOKENS ] ?? [] ).filter( ( token: string ) => !token.startsWith( 'DEPRECATED' ) ).map( ( name: string ) => ( { name, type: 'elevation' } ) );
 
-    TYPOGRAPHY_TOKENS = ( values[ config.APP_CONFIG_KEYS.TYPOGRAPHY_TOKENS ] ?? [] ).map( ( name: string ) => ( { name, type: 'typography' } ) );;
+    TYPOGRAPHY_TOKENS = ( values[ config.APP_CONFIG_KEYS.TYPOGRAPHY_TOKENS ] ?? [] ).filter( ( token: string ) => !token.startsWith( 'DEPRECATED' ) ).map( ( name: string ) => ( { name, type: 'typography' } ) );;
 
-    BUTTON_STYLE_TOKENS = ( values[ config.APP_CONFIG_KEYS.BUTTON_STYLE_TOKENS ] ?? [] ).map( ( name: string ) => ( { name, type: 'button_style' } ) );;
+    BUTTON_STYLE_TOKENS = ( values[ config.APP_CONFIG_KEYS.BUTTON_STYLE_TOKENS ] ?? [] ).filter( ( token: string ) => !token.startsWith( 'DEPRECATED' ) ).map( ( name: string ) => ( { name, type: 'button_style' } ) );;
 
-    RADIUS_TOKENS = Object.entries( values[ config.APP_CONFIG_KEYS.RADIUS_TOKENS ] ?? {} ).map( ( [ key, value ] ) => {
+    RADIUS_TOKENS = Object.entries( values[ config.APP_CONFIG_KEYS.RADIUS_TOKENS ] ?? {} ).map( ( [ name, value ] ) => {
       return {
-        name: key,
-        value: value,
+        name,
+        value: ( value as string ).replace( 'util.', '' ),
         type: 'radius-tokens'
       };
     } ) as { name: string, value: string, type: string }[];
@@ -54,7 +55,7 @@ config.appConfig.subscribe( ( values ) => {
     SPACING_TOKENS = Object.entries( values[ config.APP_CONFIG_KEYS.SPACING_TOKENS ] ).map( ( [ name, value ] ) => {
       return {
         name,
-        value: (value as string),
+        value: ( value as string ).replace( 'util.', '' ),
         type: 'spacing_tokens'
       };
     } );
